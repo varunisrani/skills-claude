@@ -1,0 +1,235 @@
+FastAPI Production Template - Directory Structure
+================================================
+
+/home/user/skills-claude/
+│
+├── app/                                    # Main application package
+│   ├── __init__.py
+│   ├── main.py                            # FastAPI app entry point
+│   │
+│   ├── api/                               # API layer
+│   │   ├── __init__.py
+│   │   ├── dependencies.py                # Auth dependencies (get_current_user)
+│   │   └── v1/                           # API version 1
+│   │       ├── __init__.py
+│   │       ├── router.py                  # API router aggregation
+│   │       └── endpoints/                 # API endpoints
+│   │           ├── __init__.py
+│   │           ├── auth.py               # POST /register, POST /login
+│   │           ├── users.py              # GET/PATCH /me, GET /{id}
+│   │           └── items.py              # Full CRUD for items
+│   │
+│   ├── core/                              # Core configuration
+│   │   ├── __init__.py
+│   │   ├── config.py                      # Pydantic settings
+│   │   ├── database.py                    # SQLAlchemy async setup
+│   │   └── security.py                    # JWT & password hashing
+│   │
+│   ├── models/                            # SQLAlchemy database models
+│   │   ├── __init__.py
+│   │   ├── user.py                        # User model
+│   │   └── item.py                        # Item model
+│   │
+│   ├── schemas/                           # Pydantic schemas
+│   │   ├── __init__.py
+│   │   ├── user.py                        # User schemas
+│   │   ├── item.py                        # Item schemas
+│   │   └── token.py                       # Token schemas
+│   │
+│   ├── services/                          # Business logic layer
+│   │   ├── __init__.py
+│   │   ├── user_service.py                # User business logic
+│   │   └── auth_service.py                # Authentication logic
+│   │
+│   └── repositories/                      # Data access layer
+│       ├── __init__.py
+│       ├── base_repository.py             # Generic CRUD operations
+│       ├── user_repository.py             # User data access
+│       └── item_repository.py             # Item data access
+│
+├── tests/                                 # Test suite
+│   ├── __init__.py
+│   ├── conftest.py                        # Pytest fixtures
+│   ├── test_auth.py                       # Authentication tests
+│   ├── test_users.py                      # User endpoint tests
+│   └── test_items.py                      # Item endpoint tests
+│
+├── .env.example                           # Environment variables template
+├── .dockerignore                          # Docker ignore rules
+├── .gitignore                             # Git ignore rules
+│
+├── Dockerfile                             # Docker container config
+├── docker-compose.yml                     # Docker Compose orchestration
+│
+├── requirements.txt                       # Python dependencies
+├── run.py                                 # Development server runner
+├── init_db.py                             # Database initialization
+│
+├── README.md                              # Comprehensive documentation
+├── QUICKSTART.md                          # Quick start guide
+├── PROJECT_SUMMARY.md                     # Project overview
+└── STRUCTURE.txt                          # This file
+
+
+Layer Architecture
+==================
+
+┌─────────────────────────────────────────┐
+│          API Layer (FastAPI)            │
+│   - Route handlers                      │
+│   - Request/Response validation         │
+│   - HTTP concerns                       │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│        Service Layer (Business)         │
+│   - Business logic                      │
+│   - Data validation                     │
+│   - Orchestration                       │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│      Repository Layer (Data Access)     │
+│   - CRUD operations                     │
+│   - Custom queries                      │
+│   - Database abstraction                │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│       Model Layer (Database)            │
+│   - SQLAlchemy models                   │
+│   - Database schema                     │
+│   - Relationships                       │
+└─────────────────────────────────────────┘
+
+
+API Endpoints
+=============
+
+Authentication (/api/v1/auth)
+  POST   /register              Register new user
+  POST   /login                 Login and get JWT token
+
+Users (/api/v1/users)
+  GET    /me                    Get current user profile
+  PATCH  /me                    Update current user
+  GET    /{user_id}             Get user by ID
+
+Items (/api/v1/items)
+  POST   /                      Create item
+  GET    /                      List user's items
+  GET    /{item_id}             Get item by ID
+  PATCH  /{item_id}             Update item
+  DELETE /{item_id}             Delete item
+
+
+Technology Stack
+================
+
+Framework & Server:
+  - FastAPI 0.109.0
+  - Uvicorn (ASGI server)
+
+Database:
+  - SQLAlchemy 2.0 (async ORM)
+  - SQLite (default) / PostgreSQL ready
+
+Validation & Serialization:
+  - Pydantic 2.5
+  - Pydantic Settings
+
+Security:
+  - python-jose (JWT)
+  - passlib (bcrypt)
+
+Testing:
+  - pytest
+  - pytest-asyncio
+  - httpx (async client)
+
+Code Quality:
+  - black (formatting)
+  - flake8 (linting)
+  - mypy (type checking)
+
+
+Key Features
+============
+
+✓ Async/await patterns throughout
+✓ Clean architecture (layered design)
+✓ Repository pattern for data access
+✓ Service layer for business logic
+✓ JWT authentication
+✓ Password hashing (bcrypt)
+✓ OAuth2 password flow
+✓ Dependency injection
+✓ Type hints everywhere
+✓ Pydantic validation
+✓ Auto-generated API docs
+✓ Comprehensive error handling
+✓ CORS middleware
+✓ Database migrations ready
+✓ Docker support
+✓ Complete test suite
+✓ Production-ready structure
+
+
+Database Schema
+===============
+
+users
+  - id (PK)
+  - email (unique)
+  - hashed_password
+  - full_name
+  - is_active
+  - is_superuser
+  - created_at
+  - updated_at
+  └── items (1:N relationship)
+
+items
+  - id (PK)
+  - title
+  - description
+  - is_active
+  - owner_id (FK → users.id)
+  - created_at
+  - updated_at
+
+
+Code Statistics
+===============
+
+Application Code:  ~1,305 lines
+Test Code:         ~375 lines
+Total Files:       35+ files
+API Endpoints:     10 endpoints
+Models:            2 models
+Schemas:           6+ schemas
+Repositories:      3 repositories
+Services:          2 services
+
+
+Quick Commands
+==============
+
+Install & Run:
+  python -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+  python init_db.py
+  python run.py
+
+Run Tests:
+  pytest
+  pytest --cov=app tests/
+
+Docker:
+  docker-compose up
+
+Access:
+  API:   http://localhost:8000
+  Docs:  http://localhost:8000/docs
+  ReDoc: http://localhost:8000/redoc
