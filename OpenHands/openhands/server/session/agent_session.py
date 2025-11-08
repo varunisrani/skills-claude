@@ -7,9 +7,12 @@ from typing import Callable, cast
 
 from openhands.controller import AgentController
 from openhands.controller.agent import Agent
+from openhands.controller.agent_detector import detect_agent_type, AgentType
+from openhands.controller.orchestrator_adapter import OrchestratorAdapter
 from openhands.controller.replay import ReplayManager
 from openhands.controller.state.state import State
 from openhands.core.config import AgentConfig, LLMConfig, OpenHandsConfig
+from openhands.core.config.sdk_config import get_sdk_config
 from openhands.core.exceptions import AgentRuntimeUnavailableError
 from openhands.core.logger import OpenHandsLoggerAdapter
 from openhands.core.schema.agent import AgentState
@@ -43,7 +46,9 @@ class AgentSession:
     """Represents a session with an Agent
 
     Attributes:
-        controller: The AgentController instance for controlling the agent.
+        controller: The AgentController instance for controlling the agent (legacy path).
+        orchestrator: The OrchestratorAdapter instance for SDK agents.
+        agent_type: Detected type of agent (SDK or LEGACY).
     """
 
     sid: str
@@ -52,9 +57,11 @@ class AgentSession:
     llm_registry: LLMRegistry
     file_store: FileStore
     controller: AgentController | None = None
+    orchestrator: OrchestratorAdapter | None = None
     runtime: Runtime | None = None
 
     memory: Memory | None = None
+    agent_type: str = AgentType.LEGACY
     _starting: bool = False
     _started_at: float = 0
     _closed: bool = False
@@ -179,14 +186,44 @@ class AgentSession:
                     agent_configs,
                 )
             else:
-                self.controller, restored_state = self._create_controller(
-                    agent,
-                    config.security.confirmation_mode,
-                    max_iterations,
-                    max_budget_per_task=max_budget_per_task,
-                    agent_to_llm_config=agent_to_llm_config,
-                    agent_configs=agent_configs,
-                )
+                # Phase 6C: Detect agent type and route appropriately
+                self.agent_type = detect_agent_type(agent)
+                sdk_config = get_sdk_config()
+
+                # Check if SDK integration is enabled via feature flag
+                use_sdk_integration = sdk_config.use_sdk_agents or sdk_config.use_sdk_orchestrator
+
+                # Route based on agent type and feature flag
+                if self.agent_type == AgentType.SDK and use_sdk_integration:
+                    # SDK path: Use OrchestratorAdapter
+                    self.logger.info(
+                        f"Using SDK execution path for {agent.name} (feature flag enabled)"
+                    )
+                    self.orchestrator, restored_state = self._create_orchestrator(
+                        agent,
+                        config,
+                        max_iterations,
+                        max_budget_per_task=max_budget_per_task,
+                    )
+                else:
+                    # Legacy path: Use AgentController
+                    if self.agent_type == AgentType.SDK and not use_sdk_integration:
+                        self.logger.info(
+                            f"Using legacy execution path for {agent.name} "
+                            "(SDK agent but feature flag disabled)"
+                        )
+                    else:
+                        self.logger.info(
+                            f"Using legacy execution path for {agent.name}"
+                        )
+                    self.controller, restored_state = self._create_controller(
+                        agent,
+                        config.security.confirmation_mode,
+                        max_iterations,
+                        max_budget_per_task=max_budget_per_task,
+                        agent_to_llm_config=agent_to_llm_config,
+                        agent_configs=agent_configs,
+                    )
 
             if not self._closed:
                 if initial_message:
@@ -238,9 +275,16 @@ class AgentSession:
                 break
         if self.event_stream is not None:
             self.event_stream.close()
+        # Phase 6C: Handle both controller and orchestrator
         if self.controller is not None:
             self.controller.save_state()
             await self.controller.close()
+        if self.orchestrator is not None:
+            # Save state from orchestrator
+            state = self.orchestrator.get_state()
+            if state:
+                state.save_to_session(self.sid, self.file_store)
+            self.orchestrator.close()
         if self.runtime is not None:
             EXECUTOR.submit(self.runtime.close)
 
@@ -445,6 +489,60 @@ class AgentSession:
 
         return (controller, initial_state is not None)
 
+    def _create_orchestrator(
+        self,
+        agent: Agent,
+        config: OpenHandsConfig,
+        max_iterations: int,
+        max_budget_per_task: float | None = None,
+    ) -> tuple[OrchestratorAdapter, bool]:
+        """Creates an OrchestratorAdapter instance for SDK agents
+
+        Parameters:
+        - agent: SDK agent instance
+        - config: OpenHands configuration
+        - max_iterations: Maximum iterations
+        - max_budget_per_task: Maximum budget per task
+
+        Returns:
+            OrchestratorAdapter and a bool indicating if state was restored
+        """
+        if self.orchestrator is not None:
+            raise RuntimeError('Orchestrator already created')
+        if self.runtime is None:
+            raise RuntimeError(
+                'Runtime must be initialized before the orchestrator'
+            )
+
+        msg = (
+            '\n--------------------------------- OpenHands Configuration ---------------------------------\n'
+            f'Agent Type: SDK\n'
+            f'Agent: {agent.name}\n'
+            f'Runtime: {self.runtime.__class__.__name__}\n'
+            f'Plugins: {[p.name for p in agent.sandbox_plugins] if agent.sandbox_plugins else "None"}\n'
+            '-------------------------------------------------------------------------------------------'
+        )
+        self.logger.debug(msg)
+
+        # Check for restored state
+        initial_state = self._maybe_restore_state()
+
+        # Create OrchestratorAdapter
+        orchestrator = OrchestratorAdapter(
+            config=config,
+            event_stream=self.event_stream,
+            workspace=config.workspace_base,
+            agent=agent,
+            conversation_stats=self.conversation_stats,
+        )
+
+        # If we have restored state, sync it to the orchestrator
+        if initial_state is not None:
+            orchestrator.state = initial_state
+            self.logger.debug(f'Restored state synced to orchestrator')
+
+        return (orchestrator, initial_state is not None)
+
     async def _create_memory(
         self,
         selected_repository: str | None,
@@ -481,11 +579,14 @@ class AgentSession:
         return memory
 
     def get_state(self) -> AgentState | None:
-        controller = self.controller
-        if controller:
-            return controller.state.agent_state
+        # Phase 6C: Handle both controller and orchestrator
+        if self.controller:
+            return self.controller.state.agent_state
+        if self.orchestrator:
+            state = self.orchestrator.get_state()
+            return state.agent_state if state else None
         if time.time() > self._started_at + WAIT_TIME_BEFORE_CLOSE:
-            # If 5 minutes have elapsed and we still don't have a controller, something has gone wrong
+            # If 5 minutes have elapsed and we still don't have a controller/orchestrator, something has gone wrong
             return AgentState.ERROR
         return None
 
