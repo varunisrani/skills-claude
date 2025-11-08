@@ -119,6 +119,35 @@ class State:
 
     metrics: Metrics = field(default_factory=Metrics)
 
+    # SDK-specific metadata tracking
+    # Used to track SDK agent-specific information like turn count, model info, etc.
+    sdk_metadata: dict[str, Any] | None = None
+
+    def update_sdk_metadata(self, key: str, value: Any) -> None:
+        """Update SDK-specific metadata.
+
+        Args:
+            key: Metadata key to update
+            value: Metadata value to set
+        """
+        if self.sdk_metadata is None:
+            self.sdk_metadata = {}
+        self.sdk_metadata[key] = value
+
+    def get_sdk_metadata(self, key: str, default: Any = None) -> Any:
+        """Get SDK metadata value.
+
+        Args:
+            key: Metadata key to retrieve
+            default: Default value if key not found
+
+        Returns:
+            Metadata value or default
+        """
+        if self.sdk_metadata is None:
+            return default
+        return self.sdk_metadata.get(key, default)
+
     def save_to_session(
         self, sid: str, file_store: FileStore, user_id: str | None
     ) -> None:
@@ -243,6 +272,9 @@ class State:
 
         if not hasattr(self, 'budget_flag'):
             self.budget_flag = None
+
+        if not hasattr(self, 'sdk_metadata'):
+            self.sdk_metadata = None
 
     def get_current_user_intent(self) -> tuple[str | None, list[str] | None]:
         """Returns the latest user message and image(if provided) that appears after a FinishAction, or the first (the task) if nothing was finished yet."""
