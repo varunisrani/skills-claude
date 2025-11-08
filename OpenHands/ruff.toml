@@ -1,0 +1,55 @@
+# Ruff configuration for code linting and formatting
+# https://docs.astral.sh/ruff/
+
+target-version = "py312"
+line-length = 100
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+]
+
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Function calls in argument defaults
+    "B904",   # Within an except clause, raise exceptions with raise ... from
+    "C901",   # Function is too complex
+    "ARG002", # Unused method argument
+]
+
+# Ignore certain files/directories
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules",
+    "*.egg-info",
+    "migrations",
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Unused imports
+"tests/**/*.py" = [
+    "ARG",  # Unused function arguments in tests
+    "S101", # Use of assert
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[lint.isort]
+known-first-party = ["openhands"]
