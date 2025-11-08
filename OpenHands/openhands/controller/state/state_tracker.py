@@ -266,3 +266,50 @@ class StateTracker:
             self.state.budget_flag.current_value = (
                 self.state.conversation_stats.get_combined_metrics().accumulated_cost
             )
+
+    def track_sdk_step(
+        self, action: Event, sdk_metadata: dict[str, any] | None = None
+    ) -> None:
+        """Track SDK agent step with metadata.
+
+        This method updates SDK-specific metadata for tracking SDK agent execution,
+        including token usage, model information, and step counts.
+
+        Args:
+            action: The action taken by the SDK agent
+            sdk_metadata: Additional SDK-specific metadata to track
+        """
+        # Update step count
+        current_step = self.state.get_sdk_metadata('step_count', 0)
+        self.state.update_sdk_metadata('step_count', current_step + 1)
+
+        # Track last action type
+        self.state.update_sdk_metadata('last_action_type', type(action).__name__)
+
+        # Update SDK-specific metadata if provided
+        if sdk_metadata:
+            # Track token usage if available
+            if 'token_usage' in sdk_metadata:
+                total_tokens = self.state.get_sdk_metadata('total_tokens', 0)
+                self.state.update_sdk_metadata(
+                    'total_tokens', total_tokens + sdk_metadata['token_usage']
+                )
+
+            # Track model information if available
+            if 'model' in sdk_metadata:
+                self.state.update_sdk_metadata('model', sdk_metadata['model'])
+
+            # Track turn count if available
+            if 'turn_count' in sdk_metadata:
+                self.state.update_sdk_metadata('turn_count', sdk_metadata['turn_count'])
+
+            # Track any other custom metadata
+            for key, value in sdk_metadata.items():
+                if key not in ('token_usage', 'model', 'turn_count'):
+                    self.state.update_sdk_metadata(key, value)
+
+        logger.debug(
+            f'SDK step tracked: {type(action).__name__}, '
+            f'step_count={self.state.get_sdk_metadata("step_count")}, '
+            f'sdk_metadata={sdk_metadata}'
+        )

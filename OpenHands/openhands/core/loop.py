@@ -1,6 +1,8 @@
 import asyncio
+from typing import Union
 
 from openhands.controller import AgentController
+from openhands.controller.orchestrator_adapter import OrchestratorAdapter
 from openhands.core.logger import openhands_logger as logger
 from openhands.core.schema import AgentState
 from openhands.memory.memory import Memory
@@ -9,23 +11,37 @@ from openhands.runtime.runtime_status import RuntimeStatus
 
 
 async def run_agent_until_done(
-    controller: AgentController,
+    controller: Union[AgentController, OrchestratorAdapter],
     runtime: Runtime,
     memory: Memory,
     end_states: list[AgentState],
     skip_set_callback: bool = False,
 ) -> None:
-    """run_agent_until_done takes a controller and a runtime, and will run
+    """run_agent_until_done takes a controller/orchestrator and a runtime, and will run
     the agent until it reaches a terminal state.
     Note that runtime must be connected before being passed in here.
+
+    Phase 6C: Now supports both AgentController (legacy) and OrchestratorAdapter (SDK).
     """
+    # Detect executor type
+    is_sdk_agent = isinstance(controller, OrchestratorAdapter)
+    executor_type = "SDK" if is_sdk_agent else "Legacy"
+
+    logger.info(f"Running agent loop with {executor_type} executor")
 
     def status_callback(msg_type: str, runtime_status: RuntimeStatus, msg: str) -> None:
         if msg_type == 'error':
             logger.error(msg)
             if controller:
-                controller.state.last_error = msg
-                asyncio.create_task(controller.set_agent_state_to(AgentState.ERROR))
+                # Get state from appropriate executor
+                if is_sdk_agent:
+                    state = controller.get_state()
+                    if state:
+                        state.last_error = msg
+                        state.agent_state = AgentState.ERROR
+                else:
+                    controller.state.last_error = msg
+                    asyncio.create_task(controller.set_agent_state_to(AgentState.ERROR))
         else:
             logger.info(msg)
 
@@ -43,5 +59,27 @@ async def run_agent_until_done(
         controller.status_callback = status_callback
         memory.status_callback = status_callback
 
-    while controller.state.agent_state not in end_states:
+    # Main event loop - unified for both executor types
+    while True:
+        # Get current state from appropriate executor
+        if is_sdk_agent:
+            state = controller.get_state()
+            current_state = state.agent_state if state else AgentState.ERROR
+        else:
+            current_state = controller.state.agent_state
+
+        # Check if we've reached a terminal state
+        if current_state in end_states:
+            logger.info(f"{executor_type} agent reached terminal state: {current_state}")
+            break
+
+        # Track SDK-specific metrics if available
+        if is_sdk_agent and state and hasattr(state, 'sdk_metadata'):
+            if state.sdk_metadata:
+                logger.debug(
+                    f"SDK agent progress - "
+                    f"iteration: {state.iteration}, "
+                    f"sdk_steps: {state.sdk_metadata.get('step_count', 0)}"
+                )
+
         await asyncio.sleep(1)

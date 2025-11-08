@@ -30,6 +30,9 @@ try:
     from openhands.agenthub.codeact_agent.codeact_agent_sdk import CodeActAgentSDK
     from openhands.agenthub.browsing_agent.browsing_agent_sdk import BrowsingAgentSDK
     from openhands.agenthub.readonly_agent.readonly_agent_sdk import ReadOnlyAgentSDK
+    from openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk import VisualBrowsingAgentSDK
+    from openhands.agenthub.loc_agent.loc_agent_sdk import LocAgentSDK
+    from openhands.agenthub.dummy_agent.agent_sdk import DummyAgentSDK
     from openhands.agenthub.agent_factory import AgentFactory
     SDK_AGENTS_AVAILABLE = True
 except ImportError as e:
@@ -344,6 +347,9 @@ class TestAgentFactory:
         assert AgentFactory.has_sdk_version("CodeActAgent") == True
         assert AgentFactory.has_sdk_version("BrowsingAgent") == True
         assert AgentFactory.has_sdk_version("ReadOnlyAgent") == True
+        assert AgentFactory.has_sdk_version("VisualBrowsingAgent") == True
+        assert AgentFactory.has_sdk_version("LOCAgent") == True
+        assert AgentFactory.has_sdk_version("DummyAgent") == True
 
     @patch('openhands.agenthub.agent_factory.ClaudeSDKAdapter')
     def test_get_agent_info(self, mock_adapter_class, mock_config, mock_llm_registry):
@@ -371,6 +377,122 @@ class TestAgentFactory:
         assert agent is not None
         assert isinstance(agent, CodeActAgentSDK)
         assert agent.VERSION == '3.0-SDK'
+
+
+class TestVisualBrowsingAgentSDK:
+    """Test VisualBrowsingAgentSDK."""
+
+    @patch('openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk.create_browser_mcp_server')
+    @patch('openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk.ClaudeSDKAdapter')
+    def test_initialization(self, mock_adapter_class, mock_mcp_server, mock_config, mock_llm_registry):
+        """Test VisualBrowsingAgentSDK initializes correctly."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+        mock_mcp_server.return_value = Mock()
+
+        agent = VisualBrowsingAgentSDK(mock_config, mock_llm_registry)
+
+        assert agent is not None
+        assert hasattr(agent, 'adapter')
+        assert agent.VERSION == '2.0-SDK'
+
+    @patch('openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk.create_browser_mcp_server')
+    @patch('openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk.ClaudeSDKAdapter')
+    def test_step_exit_command(self, mock_adapter_class, mock_mcp_server, mock_config, mock_llm_registry, mock_state):
+        """Test visual browsing agent handles /exit command."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+        mock_mcp_server.return_value = Mock()
+
+        agent = VisualBrowsingAgentSDK(mock_config, mock_llm_registry)
+
+        # Set exit command
+        mock_state.get_last_user_message.return_value = MessageAction(
+            content="/exit",
+            source="user"
+        )
+
+        action = agent.step(mock_state)
+
+        assert isinstance(action, AgentFinishAction)
+
+
+class TestLocAgentSDK:
+    """Test LocAgentSDK."""
+
+    @patch('openhands.agenthub.loc_agent.loc_agent_sdk.create_jupyter_mcp_server')
+    @patch('openhands.agenthub.loc_agent.loc_agent_sdk.ClaudeSDKAdapter')
+    def test_initialization(self, mock_adapter_class, mock_mcp_server, mock_config, mock_llm_registry):
+        """Test LocAgentSDK initializes correctly."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+        mock_mcp_server.return_value = Mock()
+
+        agent = LocAgentSDK(mock_config, mock_llm_registry)
+
+        assert agent is not None
+        assert hasattr(agent, 'adapter')
+        assert agent.VERSION == '2.0-SDK'
+
+    @patch('openhands.agenthub.loc_agent.loc_agent_sdk.create_jupyter_mcp_server')
+    @patch('openhands.agenthub.loc_agent.loc_agent_sdk.ClaudeSDKAdapter')
+    def test_step_exit_command(self, mock_adapter_class, mock_mcp_server, mock_config, mock_llm_registry, mock_state):
+        """Test LOC agent handles /exit command."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+        mock_mcp_server.return_value = Mock()
+
+        agent = LocAgentSDK(mock_config, mock_llm_registry)
+
+        # Set exit command
+        mock_state.get_last_user_message.return_value = MessageAction(
+            content="/exit",
+            source="user"
+        )
+
+        action = agent.step(mock_state)
+
+        assert isinstance(action, AgentFinishAction)
+
+
+class TestDummyAgentSDK:
+    """Test DummyAgentSDK."""
+
+    @patch('openhands.agenthub.dummy_agent.agent_sdk.ClaudeSDKAdapter')
+    def test_initialization(self, mock_adapter_class, mock_config, mock_llm_registry):
+        """Test DummyAgentSDK initializes correctly."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+
+        agent = DummyAgentSDK(mock_config, mock_llm_registry)
+
+        assert agent is not None
+        assert hasattr(agent, 'adapter')
+        assert agent.VERSION == '2.0-SDK'
+
+    @patch('openhands.agenthub.dummy_agent.agent_sdk.ClaudeSDKAdapter')
+    def test_step_exit_command(self, mock_adapter_class, mock_config, mock_llm_registry, mock_state):
+        """Test dummy agent handles /exit command."""
+        mock_adapter = Mock()
+        mock_adapter.initialize = AsyncMock()
+        mock_adapter_class.return_value = mock_adapter
+
+        agent = DummyAgentSDK(mock_config, mock_llm_registry)
+
+        # Set exit command
+        mock_state.get_last_user_message.return_value = MessageAction(
+            content="/exit",
+            source="user"
+        )
+
+        action = agent.step(mock_state)
+
+        assert isinstance(action, AgentFinishAction)
 
 
 class TestBackwardCompatibility:

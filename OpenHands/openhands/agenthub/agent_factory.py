@@ -56,9 +56,9 @@ class AgentFactory:
     - CodeActAgent / CodeActAgentSDK
     - BrowsingAgent / BrowsingAgentSDK
     - ReadOnlyAgent / ReadOnlyAgentSDK
-    - DummyAgent (legacy only)
-    - LOCAgent (legacy only)
-    - VisualBrowsingAgent (legacy only)
+    - VisualBrowsingAgent / VisualBrowsingAgentSDK
+    - LOCAgent / LocAgentSDK
+    - DummyAgent / DummyAgentSDK
     """
 
     # Map of agent names to their classes
@@ -75,6 +75,9 @@ class AgentFactory:
         "CodeActAgent": None,  # Will be lazily loaded
         "BrowsingAgent": None,
         "ReadOnlyAgent": None,
+        "VisualBrowsingAgent": None,
+        "LOCAgent": None,
+        "DummyAgent": None,
     }
 
     @classmethod
@@ -145,6 +148,18 @@ class AgentFactory:
         elif agent_name == "ReadOnlyAgent":
             from openhands.agenthub.readonly_agent.readonly_agent_sdk import ReadOnlyAgentSDK
             return ReadOnlyAgentSDK
+
+        elif agent_name == "VisualBrowsingAgent":
+            from openhands.agenthub.visualbrowsing_agent.visualbrowsing_agent_sdk import VisualBrowsingAgentSDK
+            return VisualBrowsingAgentSDK
+
+        elif agent_name == "LOCAgent":
+            from openhands.agenthub.loc_agent.loc_agent_sdk import LocAgentSDK
+            return LocAgentSDK
+
+        elif agent_name == "DummyAgent":
+            from openhands.agenthub.dummy_agent.agent_sdk import DummyAgentSDK
+            return DummyAgentSDK
 
         else:
             raise ImportError(
@@ -345,3 +360,30 @@ def create_readonly_agent(
 ) -> Agent:
     """Create a ReadOnlyAgent instance."""
     return AgentFactory.create_agent("ReadOnlyAgent", config, llm_registry, use_sdk)
+
+
+def create_visualbrowsing_agent(
+    config: AgentConfig,
+    llm_registry: LLMRegistry,
+    use_sdk: Optional[bool] = None
+) -> Agent:
+    """Create a VisualBrowsingAgent instance."""
+    return AgentFactory.create_agent("VisualBrowsingAgent", config, llm_registry, use_sdk)
+
+
+def create_loc_agent(
+    config: AgentConfig,
+    llm_registry: LLMRegistry,
+    use_sdk: Optional[bool] = None
+) -> Agent:
+    """Create a LOCAgent instance."""
+    return AgentFactory.create_agent("LOCAgent", config, llm_registry, use_sdk)
+
+
+def create_dummy_agent(
+    config: AgentConfig,
+    llm_registry: LLMRegistry,
+    use_sdk: Optional[bool] = None
+) -> Agent:
+    """Create a DummyAgent instance."""
+    return AgentFactory.create_agent("DummyAgent", config, llm_registry, use_sdk)
