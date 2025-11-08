@@ -262,7 +262,9 @@ class Runtime(FileEditRuntimeMixin):
         import os
         import sys
 
-        is_windows = os.name == 'nt' or sys.platform == 'win32'
+        # Docker containers are always Linux, even on Windows hosts
+        # Only use PowerShell syntax for native Windows runtimes
+        is_windows = (os.name == 'nt' or sys.platform == 'win32') and self.__class__.__name__ != 'DockerRuntime'
 
         if is_windows:
             # Add env vars using PowerShell commands for Windows
