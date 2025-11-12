@@ -85,3 +85,71 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Diff Viewer Styles */
+.diff-viewer-content {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.diff-viewer-content .diff {
+  border: 1px solid hsl(var(--border));
+}
+
+.diff-viewer-content .diff-gutter {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  padding: 0 0.5rem;
+  text-align: right;
+  user-select: none;
+  min-width: 3rem;
+}
+
+.diff-viewer-content .diff-code {
+  padding: 0 0.5rem;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.diff-viewer-content .diff-line {
+  display: table-row;
+}
+
+.diff-viewer-content .diff-line-insert {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.diff-viewer-content .diff-line-insert .diff-code {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+
+.diff-viewer-content .diff-line-delete {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.diff-viewer-content .diff-line-delete .diff-code {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.diff-viewer-content .diff-line-normal {
+  background-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .diff-viewer-content .diff-line-insert {
+    background-color: rgba(34, 197, 94, 0.15);
+  }
+
+  .diff-viewer-content .diff-line-insert .diff-code {
+    background-color: rgba(34, 197, 94, 0.2);
+  }
+
+  .diff-viewer-content .diff-line-delete {
+    background-color: rgba(239, 68, 68, 0.15);
+  }
+
+  .diff-viewer-content .diff-line-delete .diff-code {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+}

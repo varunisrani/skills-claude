@@ -24,12 +24,17 @@ import type {
   StopTaskResponse,
   RestartTaskResponse,
   IterateTaskResponse,
+  MergeTaskResponse,
+  PushTaskResponse,
   StopTaskRequest,
   RestartTaskRequest,
   IterateTaskRequest,
+  MergeTaskRequest,
+  PushTaskRequest,
 } from '@/types/api';
 import type { TaskStatus } from '@/types/task';
 import { taskKeys } from './useTasks';
+import { iterationKeys } from './useTaskIterations';
 
 /**
  * Hook to fetch a single task's details
@@ -340,6 +345,140 @@ export function useIterateTaskMutation() {
       queryClient.invalidateQueries({ queryKey: taskKeys.inspect(variables.taskId) });
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
       queryClient.invalidateQueries({ queryKey: taskKeys.logs(variables.taskId) });
+      queryClient.invalidateQueries({ queryKey: iterationKeys.list(variables.taskId) });
+    },
+  });
+}
+
+/**
+ * Hook to merge task changes
+ *
+ * Merges the task's changes back to the source/target branch.
+ * Use force option to override merge conflicts.
+ *
+ * Features:
+ * - Automatic cache invalidation
+ * - Proper error handling
+ * - Returns merge result with conflicts
+ *
+ * @returns Mutation object with mutate function and state
+ *
+ * @example
+ * ```tsx
+ * const mergeTask = useMergeTaskMutation();
+ *
+ * const handleMerge = (taskId: number, force: boolean) => {
+ *   mergeTask.mutate({ taskId, force });
+ * };
+ * ```
+ */
+export function useMergeTaskMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      force = false,
+      targetBranch,
+    }: {
+      taskId: number;
+      force?: boolean;
+      targetBranch?: string;
+    }) => {
+      const response = await fetch(`/api/tasks/${taskId}/merge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ force, targetBranch } as MergeTaskRequest),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to merge task' }));
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+
+      const data: MergeTaskResponse = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to merge task');
+      }
+
+      return data.data;
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: taskKeys.detail(variables.taskId) });
+      queryClient.invalidateQueries({ queryKey: taskKeys.inspect(variables.taskId) });
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to push task changes to GitHub
+ *
+ * Pushes the task's changes to GitHub and optionally creates a PR.
+ *
+ * Features:
+ * - Automatic cache invalidation
+ * - Proper error handling
+ * - Returns PR URL if created
+ *
+ * @returns Mutation object with mutate function and state
+ *
+ * @example
+ * ```tsx
+ * const pushTask = usePushTaskMutation();
+ *
+ * const handlePush = (taskId: number, message: string) => {
+ *   pushTask.mutate({ taskId, message });
+ * };
+ * ```
+ */
+export function usePushTaskMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      message,
+      createPR,
+      prTitle,
+      prDescription,
+    }: {
+      taskId: number;
+      message?: string;
+      createPR?: boolean;
+      prTitle?: string;
+      prDescription?: string;
+    }) => {
+      const response = await fetch(`/api/tasks/${taskId}/push`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, createPR, prTitle, prDescription } as PushTaskRequest),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to push task' }));
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+
+      const data: PushTaskResponse = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to push task');
+      }
+
+      return data.data;
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: taskKeys.detail(variables.taskId) });
+      queryClient.invalidateQueries({ queryKey: taskKeys.inspect(variables.taskId) });
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },
   });
 }
