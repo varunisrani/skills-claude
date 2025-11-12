@@ -20,17 +20,13 @@ export default function Home() {
   const router = useRouter()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // Mock tasks data - In a real app, this would come from TanStack Query
-  const mockTasks: Task[] = []
-  const isLoading = false
-
   const handleTaskClick = (taskId: number) => {
     router.push(`/tasks/${taskId}`)
   }
 
   const handleTaskCreated = (task: Task) => {
     setIsDialogOpen(false)
-    // In a real app, TanStack Query would refetch the tasks list
+    // TanStack Query will automatically refetch the tasks list
     router.push(`/tasks/${task.id}`)
   }
 
@@ -78,11 +74,7 @@ export default function Home() {
         </div>
 
         {/* Task List */}
-        <TaskList
-          tasks={mockTasks}
-          isLoading={isLoading}
-          onTaskClick={handleTaskClick}
-        />
+        <TaskList onTaskClick={handleTaskClick} />
       </div>
     </div>
   )

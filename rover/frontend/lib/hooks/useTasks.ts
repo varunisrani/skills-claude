@@ -51,22 +51,43 @@ export interface TaskListFilters {
 }
 
 /**
- * Hook to fetch all tasks with optional filtering
+ * Options for task list query with auto-refresh controls
+ */
+export interface UseTasksQueryOptions extends TaskListFilters {
+  /** Enable/disable auto-refresh polling (default: true) */
+  autoRefresh?: boolean;
+}
+
+/**
+ * Hook to fetch all tasks with optional filtering and adaptive auto-refresh
  *
  * Features:
  * - Automatic refetch on window focus
- * - Adaptive polling (polls more frequently when tasks are in progress)
+ * - Adaptive polling based on task status:
+ *   - 3s for active tasks (IN_PROGRESS, ITERATING)
+ *   - 10s for completed/failed tasks
+ *   - Stops polling for terminal states (MERGED, PUSHED)
+ * - Manual refresh control
+ * - Enable/disable auto-refresh
  * - Proper error handling
  *
- * @param filters - Optional filters for task list
- * @returns Query result with tasks data
+ * @param options - Filters and auto-refresh options
+ * @returns Query result with tasks data and manual refresh function
  *
  * @example
  * ```tsx
- * const { data, isLoading, error } = useTasksQuery({ status: 'IN_PROGRESS' });
+ * const { data, isLoading, error, refetch } = useTasksQuery({
+ *   status: 'IN_PROGRESS',
+ *   autoRefresh: true
+ * });
+ *
+ * // Manual refresh
+ * <button onClick={() => refetch()}>Refresh</button>
  * ```
  */
-export function useTasksQuery(filters?: TaskListFilters) {
+export function useTasksQuery(options?: UseTasksQueryOptions) {
+  const { autoRefresh = true, ...filters } = options || {};
+
   return useQuery({
     queryKey: taskKeys.list(filters),
     queryFn: async () => {
@@ -111,18 +132,38 @@ export function useTasksQuery(filters?: TaskListFilters) {
     },
     // Refetch on window focus to keep data fresh
     refetchOnWindowFocus: true,
-    // Adaptive polling: poll more frequently if there are in-progress tasks
+    // Adaptive polling based on task status
     refetchInterval: (query) => {
+      // Don't poll if auto-refresh is disabled
+      if (!autoRefresh) return false;
+
       const data = query.state.data;
       if (!data?.data) return false;
 
-      // Check if any tasks are in progress
+      // Check task statuses to determine polling interval
       const hasActiveTasks = data.data.some((task: TaskSummary) =>
         task.status === 'IN_PROGRESS' || task.status === 'ITERATING'
       );
 
-      // Poll every 5 seconds if there are active tasks, otherwise don't poll
-      return hasActiveTasks ? 5000 : false;
+      const hasCompletedTasks = data.data.some((task: TaskSummary) =>
+        task.status === 'COMPLETED' || task.status === 'FAILED'
+      );
+
+      const allTerminalTasks = data.data.every((task: TaskSummary) =>
+        task.status === 'MERGED' || task.status === 'PUSHED'
+      );
+
+      // Stop polling if all tasks are in terminal states
+      if (allTerminalTasks) return false;
+
+      // Poll every 3 seconds if there are active tasks
+      if (hasActiveTasks) return 3000;
+
+      // Poll every 10 seconds if there are only completed/failed tasks
+      if (hasCompletedTasks) return 10000;
+
+      // Default: don't poll if no tasks or all in other states
+      return false;
     },
     // Keep data fresh
     staleTime: 30000, // 30 seconds
