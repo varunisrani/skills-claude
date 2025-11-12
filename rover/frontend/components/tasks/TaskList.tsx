@@ -1,14 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { TaskStatus } from "@/types/task"
 import { TaskCard } from "./TaskCard"
 import { Skeleton } from "@/components/ui/skeleton"
+import { LoadingCard } from "@/components/loading/LoadingCard"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Filter, RefreshCw, Power, PowerOff } from "lucide-react"
 import { useTasksQuery } from "@/lib/hooks/useTasks"
+import { useShortcuts } from "@/lib/shortcuts/ShortcutsProvider"
+import { ShortcutBadge } from "@/components/shortcuts/ShortcutBadge"
+import { shortcuts } from "@/lib/shortcuts/shortcuts-config"
+import { ApiErrorDisplay } from "@/components/error/ApiErrorDisplay"
+import { handleError } from "@/lib/errors/error-handler"
 
 interface TaskListProps {
   onTaskClick?: (taskId: number) => void
@@ -18,6 +24,7 @@ export function TaskList({ onTaskClick }: TaskListProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL")
   const [autoRefresh, setAutoRefresh] = useState(true)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Use the useTasks hook with auto-refresh
   const { data, isLoading, isFetching, error, refetch } = useTasksQuery({
@@ -26,16 +33,28 @@ export function TaskList({ onTaskClick }: TaskListProps) {
 
   const tasks = data?.data || []
 
+  // Transform error to ApiError for better display
+  const apiError = error ? handleError(error, "TaskList") : null
+
+  // Get shortcuts context for keyboard navigation
+  const { setTotalTasks, setVisibleTaskIds, selectedTaskIndex } = useShortcuts()
+
   // Filter tasks based on search and status
   const filteredTasks = tasks.filter(task => {
-    const matchesSearch = searchQuery === "" || 
+    const matchesSearch = searchQuery === "" ||
       task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.id.toString().includes(searchQuery)
-    
+
     const matchesStatus = statusFilter === "ALL" || task.status === statusFilter
 
     return matchesSearch && matchesStatus
   })
+
+  // Update shortcuts context when filtered tasks change
+  useEffect(() => {
+    setTotalTasks(filteredTasks.length)
+    setVisibleTaskIds(filteredTasks.map((task) => task.id))
+  }, [filteredTasks, setTotalTasks, setVisibleTaskIds])
 
   if (isLoading) {
     return (
@@ -45,9 +64,7 @@ export function TaskList({ onTaskClick }: TaskListProps) {
           <Skeleton className="h-10 w-[180px]" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-[200px]" />
-          ))}
+          <LoadingCard count={6} />
         </div>
       </div>
     )
@@ -99,6 +116,7 @@ export function TaskList({ onTaskClick }: TaskListProps) {
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             {isFetching ? 'Refreshing...' : 'Refresh'}
+            <ShortcutBadge shortcut={shortcuts.REFRESH_TASKS} size="sm" />
           </Button>
 
           <Button
@@ -128,12 +146,13 @@ export function TaskList({ onTaskClick }: TaskListProps) {
         </div>
 
         {/* Error Display */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
-            <p className="text-sm text-red-800 dark:text-red-400">
-              Error loading tasks: {error.message}
-            </p>
-          </div>
+        {apiError && (
+          <ApiErrorDisplay
+            error={apiError}
+            onRetry={() => refetch()}
+            isRetrying={isFetching}
+            showRetry={true}
+          />
         )}
       </div>
 
@@ -145,19 +164,31 @@ export function TaskList({ onTaskClick }: TaskListProps) {
           </div>
           <h3 className="text-lg font-semibold mb-2">No tasks found</h3>
           <p className="text-zinc-500 dark:text-zinc-400">
-            {tasks.length === 0 
+            {tasks.length === 0
               ? "Create your first task to get started"
               : "Try adjusting your search or filters"}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onClick={() => onTaskClick?.(task.id)}
-            />
+          {filteredTasks.map((task, index) => (
+            <div key={task.id} className="relative">
+              {/* Task number badge for keyboard navigation (1-9) */}
+              {index < 9 && (
+                <div className="absolute -top-2 -left-2 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold shadow-lg">
+                  {index + 1}
+                </div>
+              )}
+              <TaskCard
+                task={task}
+                onClick={() => onTaskClick?.(task.id)}
+                className={
+                  index === selectedTaskIndex
+                    ? "ring-2 ring-blue-500 dark:ring-blue-400"
+                    : ""
+                }
+              />
+            </div>
           ))}
         </div>
       )}

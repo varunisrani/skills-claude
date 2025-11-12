@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { LoadingSpinner } from '@/components/loading/LoadingSpinner';
 import { TaskStatusBadge } from '@/components/tasks/TaskStatusBadge';
 import { IterationList } from '@/components/iterations/IterationList';
 import { IterateForm } from '@/components/iterations/IterateForm';
@@ -29,6 +30,7 @@ import {
   GitBranch,
   Workflow,
   Bot,
+  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -89,10 +91,7 @@ export default function TaskDetailPage() {
   if (taskLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-zinc-50" />
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Loading task...</p>
-        </div>
+        <LoadingSpinner size="lg" text="Loading task..." />
       </div>
     );
   }
@@ -212,8 +211,12 @@ export default function TaskDetailPage() {
                 onClick={() => setShowRestartConfirm(true)}
                 disabled={restartTaskMutation.isPending}
               >
-                <Play className="mr-2 h-4 w-4" />
-                Restart
+                {restartTaskMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="mr-2 h-4 w-4" />
+                )}
+                {restartTaskMutation.isPending ? 'Restarting...' : 'Restart'}
               </Button>
             )}
             {canStop && (
@@ -222,8 +225,12 @@ export default function TaskDetailPage() {
                 onClick={() => setShowStopConfirm(true)}
                 disabled={stopTaskMutation.isPending}
               >
-                <Square className="mr-2 h-4 w-4" />
-                Stop
+                {stopTaskMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Square className="mr-2 h-4 w-4" />
+                )}
+                {stopTaskMutation.isPending ? 'Stopping...' : 'Stop'}
               </Button>
             )}
             {canMerge && <MergeTaskDialog taskId={taskId} disabled={false} />}
@@ -233,8 +240,12 @@ export default function TaskDetailPage() {
               onClick={() => setShowDeleteConfirm(true)}
               disabled={deleteTaskMutation.isPending}
             >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              {deleteTaskMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-2 h-4 w-4" />
+              )}
+              {deleteTaskMutation.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </div>
 
@@ -251,7 +262,7 @@ export default function TaskDetailPage() {
       {/* Iteration History */}
       {iterationsLoading ? (
         <div className="text-center py-8">
-          <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-zinc-50" />
+          <LoadingSpinner size="md" text="Loading iterations..." />
         </div>
       ) : (
         <IterationList taskId={taskId} iterations={iterations} />
@@ -268,10 +279,15 @@ export default function TaskDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleteTaskMutation.isPending}
+              >
                 Cancel
               </Button>
               <Button variant="destructive" onClick={handleDelete} disabled={deleteTaskMutation.isPending}>
+                {deleteTaskMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {deleteTaskMutation.isPending ? 'Deleting...' : 'Delete'}
               </Button>
             </CardContent>
@@ -289,10 +305,15 @@ export default function TaskDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowStopConfirm(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowStopConfirm(false)}
+                disabled={stopTaskMutation.isPending}
+              >
                 Cancel
               </Button>
               <Button onClick={handleStop} disabled={stopTaskMutation.isPending}>
+                {stopTaskMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {stopTaskMutation.isPending ? 'Stopping...' : 'Stop'}
               </Button>
             </CardContent>
@@ -310,10 +331,15 @@ export default function TaskDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowRestartConfirm(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowRestartConfirm(false)}
+                disabled={restartTaskMutation.isPending}
+              >
                 Cancel
               </Button>
               <Button onClick={handleRestart} disabled={restartTaskMutation.isPending}>
+                {restartTaskMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {restartTaskMutation.isPending ? 'Restarting...' : 'Restart'}
               </Button>
             </CardContent>

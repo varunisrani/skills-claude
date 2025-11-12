@@ -75,13 +75,13 @@ function buildFileTree(files: string[], fileStats?: Record<string, FileStats>): 
           path: fullPath,
           name: part,
           type: isLast ? "file" : "directory",
-          children: isLast ? undefined : {},
+          children: isLast ? undefined : [] as FileNode[],
           stats: isLast && fileStats ? fileStats[filePath] : undefined,
         }
       }
 
       if (!isLast && current[part].children) {
-        current = current[part].children as Record<string, FileNode>
+        current = current[part].children as unknown as Record<string, FileNode>
       }
     }
   }
@@ -93,7 +93,7 @@ function buildFileTree(files: string[], fileStats?: Record<string, FileStats>): 
     // Convert children objects to arrays recursively
     nodes.forEach(node => {
       if (node.children && typeof node.children === 'object') {
-        node.children = convertToArray(node.children as Record<string, FileNode>)
+        node.children = convertToArray(node.children as unknown as Record<string, FileNode>)
       }
     })
 
