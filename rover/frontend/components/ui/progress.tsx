@@ -23,6 +23,11 @@ const Progress = React.forwardRef<
       'relative h-4 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800',
       className
     )}
+    role="progressbar"
+    aria-valuemin={0}
+    aria-valuemax={100}
+    aria-valuenow={value !== undefined ? value : undefined}
+    aria-label={props['aria-label'] || 'Progress'}
     {...props}
   >
     <ProgressPrimitive.Indicator

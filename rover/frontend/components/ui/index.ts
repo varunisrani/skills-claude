@@ -85,3 +85,5 @@ export {
 export type { ToastProps, ToastActionElement } from "./toast"
 
 export { Toaster } from "./toaster"
+
+export { Switch } from "./switch"

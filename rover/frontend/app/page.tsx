@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { TaskList } from "@/components/tasks/TaskList"
 import { CreateTaskForm } from "@/components/tasks/CreateTaskForm"
@@ -15,10 +15,16 @@ import {
 } from "@/components/ui/dialog"
 import { Plus, Rocket } from "lucide-react"
 import type { Task } from "@/types/task"
+import { ShortcutBadge } from "@/components/shortcuts/ShortcutBadge"
+import { shortcuts } from "@/lib/shortcuts/shortcuts-config"
+import { useShortcuts } from "@/lib/shortcuts/ShortcutsProvider"
+import { useKeyboardShortcut } from "@/lib/shortcuts/useKeyboardShortcuts"
 
 export default function Home() {
   const router = useRouter()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const { openHelp } = useShortcuts()
 
   const handleTaskClick = (taskId: number) => {
     router.push(`/tasks/${taskId}`)
@@ -29,6 +35,19 @@ export default function Home() {
     // TanStack Query will automatically refetch the tasks list
     router.push(`/tasks/${task.id}`)
   }
+
+  // Register page-specific shortcuts
+  useKeyboardShortcut(
+    shortcuts.CREATE_TASK.keys,
+    () => setIsDialogOpen(true),
+    { preventDefault: true }
+  )
+
+  useKeyboardShortcut(
+    shortcuts.SHOW_SHORTCUTS.keys,
+    () => openHelp(),
+    { preventDefault: true }
+  )
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -55,6 +74,7 @@ export default function Home() {
                 <Button size="lg" className="gap-2">
                   <Plus className="h-5 w-5" />
                   New Task
+                  <ShortcutBadge shortcut={shortcuts.CREATE_TASK} size="sm" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

@@ -141,12 +141,12 @@ export function TaskProgressBar({
   // For determinate state, we'll use the Progress component
 
   return (
-    <div className={cn("space-y-1", className)} role="progressbar" aria-label={displayLabel}>
+    <div className={cn("space-y-1", className)}>
       {/* Label and percentage row */}
       {(showLabel || showPercentage) && (
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          {showLabel && <span>{displayLabel}</span>}
-          {showPercentage && !isIndeterminate && <span>{value}%</span>}
+          {showLabel && <span id={`progress-label-${displayLabel}`}>{displayLabel}</span>}
+          {showPercentage && !isIndeterminate && <span aria-live="polite">{value}%</span>}
         </div>
       )}
 
@@ -160,6 +160,10 @@ export function TaskProgressBar({
               heightClass,
               trackColor
             )}
+            role="progressbar"
+            aria-label={displayLabel}
+            aria-busy="true"
+            aria-valuetext="In progress"
           >
             <div
               className={cn(
@@ -194,9 +198,8 @@ export function TaskProgressBar({
               "transition-all duration-300"
             )}
             indicatorClassName={cn(progressColor, "transition-all duration-300")}
-            aria-valuenow={value}
-            aria-valuemin={0}
-            aria-valuemax={100}
+            aria-label={displayLabel}
+            aria-valuetext={`${value || 0}% complete`}
           />
         )}
       </div>

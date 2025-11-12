@@ -17,7 +17,9 @@
 
 import * as React from "react"
 import { parseDiff, Diff, Hunk, Decoration } from "react-diff-view"
-import type { File as DiffFile, Hunk as DiffHunk } from "react-diff-view"
+// Type imports not available in current version of react-diff-view
+type DiffFile = any;
+type DiffHunk = any;
 import {
   Split,
   Columns,
@@ -368,7 +370,6 @@ export function DiffViewer({ diff, files, stats, className }: DiffViewerProps) {
                     viewType={viewType}
                     diffType={currentFile.type}
                     hunks={filteredHunks}
-                    widgets={widgets}
                   >
                     {(hunks) =>
                       hunks.map((hunk, hunkIndex) => {
