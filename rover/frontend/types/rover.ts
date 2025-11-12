@@ -28,36 +28,52 @@ export const IterationStatusNameSchema = z.enum([
 
 export type IterationStatusName = z.infer<typeof IterationStatusNameSchema>;
 
-// Task Description Schema
+// Task Description Schema - Matches rover inspect/list output
+// Note: Some fields are optional because different Rover commands return different subsets of fields
+// E.g., 'rover task' (create) returns fewer fields than 'rover inspect' (get)
 export const TaskDescriptionSchema = z.object({
-  id: z.number().int().positive(),
-  uuid: z.string().uuid(),
-  title: z.string().min(1),
-  description: z.string(),
-  inputs: z.record(z.string(), z.string()),
-  status: TaskStatusSchema,
-  createdAt: z.string().datetime(),
-  startedAt: z.string().datetime().optional(),
-  completedAt: z.string().datetime().optional(),
-  failedAt: z.string().datetime().optional(),
-  lastIterationAt: z.string().datetime().optional(),
-  lastStatusCheck: z.string().datetime().optional(),
-  iterations: z.number().int().min(1),
-  workflowName: z.string().min(1),
-  worktreePath: z.string(),
-  branchName: z.string(),
+  id: z.number().int().positive().optional(),
+  taskId: z.number().int().positive().optional(), // Used by 'rover task' command
+  uuid: z.string().optional(),
+  title: z.string().min(1).optional(),
+  description: z.string().optional(),
+  status: TaskStatusSchema.optional(),
+  createdAt: z.string().optional(),
+  startedAt: z.string().optional(),
+  lastIterationAt: z.string().optional(),
+  iterations: z.number().int().min(1).optional(),
+  workflowName: z.string().optional(),
+  branchName: z.string().optional(),
+  worktreePath: z.string().optional(),
+  // Optional fields that may appear in list but not inspect
+  inputs: z.record(z.string(), z.string()).optional(),
   agent: z.string().optional(),
+  version: z.string().optional(),
+  lastStatusCheck: z.string().optional(),
+  // Fields from inspect response
+  taskDirectory: z.string().optional(),
+  formattedStatus: z.string().optional(),
+  files: z.array(z.any()).optional(),
+  iterationFiles: z.array(z.any()).optional(),
+  statusUpdated: z.boolean().optional(),
+  // Optional completion fields
+  completedAt: z.string().optional(),
+  failedAt: z.string().optional(),
+  // Other optional fields
   sourceBranch: z.string().optional(),
   containerId: z.string().optional(),
   executionStatus: z.string().optional(),
-  runningAt: z.string().datetime().optional(),
-  errorAt: z.string().datetime().optional(),
+  runningAt: z.string().optional(),
+  errorAt: z.string().optional(),
   exitCode: z.number().int().optional(),
   error: z.string().optional(),
   restartCount: z.number().int().min(0).optional(),
-  lastRestartAt: z.string().datetime().optional(),
-  version: z.string(),
-});
+  lastRestartAt: z.string().optional(),
+  // Workspace info from 'rover task' command
+  workspace: z.string().optional(),
+  savedTo: z.string().optional(),
+  success: z.boolean().optional(),
+}).passthrough();
 
 export type TaskDescription = z.infer<typeof TaskDescriptionSchema>;
 

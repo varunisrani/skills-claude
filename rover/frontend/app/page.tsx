@@ -33,7 +33,12 @@ export default function Home() {
   const handleTaskCreated = (task: Task) => {
     setIsDialogOpen(false)
     // TanStack Query will automatically refetch the tasks list
-    router.push(`/tasks/${task.id}`)
+    const taskId = task.id || task.taskId
+    if (!taskId) {
+      console.error('Task created but no ID returned:', task)
+      return
+    }
+    router.push(`/tasks/${taskId}`)
   }
 
   // Register page-specific shortcuts

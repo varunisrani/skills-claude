@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { TaskStatus } from "@/types/task"
 import { TaskCard } from "./TaskCard"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,22 +39,28 @@ export function TaskList({ onTaskClick }: TaskListProps) {
   // Get shortcuts context for keyboard navigation
   const { setTotalTasks, setVisibleTaskIds, selectedTaskIndex } = useShortcuts()
 
-  // Filter tasks based on search and status
-  const filteredTasks = tasks.filter(task => {
+  // Memoize filtered tasks to prevent unnecessary re-renders
+  // Only recalculate when tasks, searchQuery, or statusFilter actually change
+  const filteredTasks = useMemo(() => tasks.filter(task => {
+    const taskId = task.id || task.taskId
     const matchesSearch = searchQuery === "" ||
       task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.id.toString().includes(searchQuery)
+      (taskId && taskId.toString().includes(searchQuery))
 
     const matchesStatus = statusFilter === "ALL" || task.status === statusFilter
 
     return matchesSearch && matchesStatus
-  })
+  }), [tasks, searchQuery, statusFilter])
+
+  // Memoize visible task IDs to avoid creating new array on every render
+  const visibleTaskIds = useMemo(() => filteredTasks.map((task) => task.id || task.taskId).filter((id) => id !== undefined) as number[], [filteredTasks])
 
   // Update shortcuts context when filtered tasks change
+  // Only depend on the actual data, not the callbacks
   useEffect(() => {
     setTotalTasks(filteredTasks.length)
-    setVisibleTaskIds(filteredTasks.map((task) => task.id))
-  }, [filteredTasks, setTotalTasks, setVisibleTaskIds])
+    setVisibleTaskIds(visibleTaskIds)
+  }, [filteredTasks.length, visibleTaskIds])
 
   if (isLoading) {
     return (

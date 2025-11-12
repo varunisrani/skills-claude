@@ -42,30 +42,38 @@ export type TaskExecutionStatus =
 /**
  * Complete task description and metadata
  * This is the primary task data structure stored in .rover/tasks/:id/task.json
+ *
+ * Note: Different Rover commands return different field names:
+ * - `rover inspect <id>` returns `id`
+ * - `rover task` (create) returns `taskId`
+ * We support both for compatibility.
  */
 export interface Task {
   // Core Identity
-  /** Numeric task identifier (sequential) */
-  id: number;
+  /** Numeric task identifier (sequential) - set by 'rover inspect' */
+  id?: number;
+
+  /** Numeric task identifier (sequential) - set by 'rover task' command */
+  taskId?: number;
 
   /** Unique UUID for the task */
-  uuid: string;
+  uuid?: string;
 
   /** Task title/summary */
-  title: string;
+  title?: string;
 
   /** Detailed task description */
-  description: string;
+  description?: string;
 
   /** Input parameters provided to the workflow */
-  inputs: Record<string, string>;
+  inputs?: Record<string, string>;
 
   // Status & Lifecycle
   /** Current task status */
-  status: TaskStatus;
+  status?: TaskStatus;
 
   /** ISO 8601 datetime when task was created */
-  createdAt: string;
+  createdAt?: string;
 
   /** ISO 8601 datetime when task execution started */
   startedAt?: string;
@@ -84,16 +92,16 @@ export interface Task {
 
   // Execution Context
   /** Current iteration number (starts at 1) */
-  iterations: number;
+  iterations?: number;
 
   /** Workflow name (e.g., 'swe', 'tech-writer') */
-  workflowName: string;
+  workflowName?: string;
 
   /** Path to the git worktree for this task */
-  worktreePath: string;
+  worktreePath?: string;
 
   /** Git branch name for this task */
-  branchName: string;
+  branchName?: string;
 
   /** AI agent being used (e.g., 'claude', 'gemini', 'codex') */
   agent?: string;
@@ -130,7 +138,17 @@ export interface Task {
 
   // Metadata
   /** Schema version for data migration */
-  version: string;
+  version?: string;
+
+  // Additional fields from rover task command
+  /** Workspace directory path (from rover task command) */
+  workspace?: string;
+
+  /** Where the task was saved (from rover task command) */
+  savedTo?: string;
+
+  /** Whether task creation was successful (from rover task command) */
+  success?: boolean;
 }
 
 /**
@@ -240,16 +258,17 @@ export interface IterationMetadata {
  * A lightweight version of Task for displaying in tables/cards
  */
 export interface TaskSummary {
-  id: number;
-  uuid: string;
-  title: string;
-  status: TaskStatus;
-  workflowName: string;
+  id?: number;
+  taskId?: number;
+  uuid?: string;
+  title?: string;
+  status?: TaskStatus;
+  workflowName?: string;
   agent?: string;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
-  iterations: number;
-  branchName: string;
+  iterations?: number;
+  branchName?: string;
 }
 
 /**
