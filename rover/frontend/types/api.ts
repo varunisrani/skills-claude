@@ -149,7 +149,7 @@ export interface GetTaskRequest {
  */
 export type GetTaskResponse = APIResponse<Task & {
   /** Iteration history (if requested) */
-  iterations?: IterationSummary[];
+  iterationHistory?: IterationSummary[];
 }>;
 
 /**
