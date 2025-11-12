@@ -177,11 +177,20 @@ export function TaskCard({
     <Card
       className={cn(
         "hover:shadow-lg transition-shadow cursor-pointer",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2",
+        "dark:focus-visible:ring-zinc-300",
         className
       )}
       onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleCardClick()
+        }
+      }}
+      tabIndex={0}
       role="article"
-      aria-label={`Task: ${displayTask.title}`}
+      aria-label={`Task ${displayTask.id}: ${displayTask.title}, Status: ${displayTask.status}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
@@ -211,17 +220,18 @@ export function TaskCard({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0"
-                aria-label="Task actions"
+                aria-label={`Actions for task ${displayTask.id}`}
+                aria-haspopup="menu"
               >
-                <MoreVertical className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" aria-label="Task actions menu">
               {onView && (
                 <DropdownMenuItem
                   onClick={(e) => handleAction(e, () => onView(displayTask.id))}
                 >
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
                   <span>View Details</span>
                 </DropdownMenuItem>
               )}
@@ -229,7 +239,7 @@ export function TaskCard({
                 <DropdownMenuItem
                   onClick={(e) => handleAction(e, () => onStop(displayTask.id))}
                 >
-                  <StopCircle className="mr-2 h-4 w-4" />
+                  <StopCircle className="mr-2 h-4 w-4" aria-hidden="true" />
                   <span>Stop Task</span>
                 </DropdownMenuItem>
               )}
@@ -239,7 +249,7 @@ export function TaskCard({
                   onClick={(e) => handleAction(e, () => onDelete(displayTask.id))}
                   className="text-destructive focus:text-destructive"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
                   <span>Delete Task</span>
                 </DropdownMenuItem>
               )}

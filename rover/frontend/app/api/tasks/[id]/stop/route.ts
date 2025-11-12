@@ -8,12 +8,20 @@
  * - Input validation with Zod schemas
  * - Command injection prevention
  * - Sanitized error messages
+ * - Centralized error handling
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getRoverCLI } from '@/lib/api/rover-cli';
 import { TaskIdSchema, StopRequestSchema } from '@/lib/utils/validation';
 import { ZodError } from 'zod';
+import {
+  handleValidationError,
+  handleRoverError,
+  handleGenericError,
+  handleInvalidTaskId,
+  handleInvalidJSON,
+} from '@/lib/api/api-error-handler';
 import type { StopTaskResponse } from '@/types/api';
 
 /**
@@ -46,13 +54,7 @@ export async function POST(
       taskId = TaskIdSchema.parse(id);
     } catch (error) {
       if (error instanceof ZodError) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Invalid task ID. Must be a positive integer.',
-          },
-          { status: 400 }
-        );
+        return handleInvalidTaskId() as any;
       }
       throw error;
     }
@@ -65,13 +67,7 @@ export async function POST(
         body = JSON.parse(text);
       }
     } catch (parseError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Invalid JSON in request body.',
-        },
-        { status: 400 }
-      );
+      return handleInvalidJSON() as any;
     }
 
     // Validate request body with Zod schema
@@ -80,14 +76,7 @@ export async function POST(
       validatedData = StopRequestSchema.parse(body);
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
-        return NextResponse.json(
-          {
-            success: false,
-            error: `Validation failed: ${errorMessages.join(', ')}`,
-          },
-          { status: 400 }
-        );
+        return handleValidationError(error) as any;
       }
       throw error;
     }
@@ -97,48 +86,12 @@ export async function POST(
     const result = await roverCLI.stopTask(taskId, validatedData.removeAll);
 
     if (!result.success) {
-      console.error('[API] Rover stop failed:', result.error);
-
-      // Check for specific error messages
-      let errorMessage = 'Failed to stop task.';
-      let statusCode = 500;
-
-      if (result.stderr?.includes('not found') || result.stderr?.includes('does not exist')) {
-        errorMessage = `Task ${taskId} not found.`;
-        statusCode = 404;
-      } else if (result.stderr?.includes('not running') || result.stderr?.includes('already stopped')) {
-        errorMessage = `Task ${taskId} is not currently running.`;
-        statusCode = 409;
-      } else if (result.stderr?.includes('container') || result.stderr?.includes('docker')) {
-        errorMessage = 'Docker container error. The task may already be stopped.';
-        statusCode = 500;
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorMessage,
-        },
-        { status: statusCode }
-      );
+      return handleRoverError(result as any, `POST /api/tasks/${taskId}/stop`) as any;
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('[API] Error in POST /api/tasks/:id/stop:', error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'An unexpected error occurred while stopping the task.',
-      },
-      { status: 500 }
-    );
+    return handleGenericError(error, 'POST /api/tasks/:id/stop') as any;
   }
 }
 
