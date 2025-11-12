@@ -15,6 +15,8 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Input } from "./input"
 export type { InputProps } from "./input"
 
+export { Label } from "./label"
+
 export { Textarea } from "./textarea"
 export type { TextareaProps } from "./textarea"
 
@@ -63,6 +65,12 @@ export {
 } from "./dropdown-menu"
 
 export { Progress } from "./progress"
+
+export { Separator } from "./separator"
+
+export { Skeleton } from "./skeleton"
+
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs"
 
 export {
   Toast,
