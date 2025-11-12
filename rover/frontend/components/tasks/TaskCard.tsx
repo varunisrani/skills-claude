@@ -131,9 +131,12 @@ export function TaskCard({
   enableRealTimeUpdates = false,
   className
 }: TaskCardProps) {
+  // Get task ID from either 'id' or 'taskId' field
+  const taskId = task.id || task.taskId
+
   // Use real-time updates if enabled
-  const { data: liveTask } = useTaskQuery(task.id, {
-    enabled: enableRealTimeUpdates
+  const { data: liveTask } = useTaskQuery(taskId, {
+    enabled: enableRealTimeUpdates && !!taskId
   })
 
   // Use live task data if available, otherwise fall back to prop
@@ -160,8 +163,8 @@ export function TaskCard({
   const handleCardClick = () => {
     if (onClick) {
       onClick(displayTask)
-    } else if (onView) {
-      onView(displayTask.id)
+    } else if (onView && taskId) {
+      onView(taskId)
     }
   }
 
@@ -190,7 +193,7 @@ export function TaskCard({
       }}
       tabIndex={0}
       role="article"
-      aria-label={`Task ${displayTask.id}: ${displayTask.title}, Status: ${displayTask.status}`}
+      aria-label={`Task ${taskId}: ${displayTask.title}, Status: ${displayTask.status}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
@@ -220,33 +223,33 @@ export function TaskCard({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0"
-                aria-label={`Actions for task ${displayTask.id}`}
+                aria-label={`Actions for task ${taskId}`}
                 aria-haspopup="menu"
               >
                 <MoreVertical className="h-4 w-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" aria-label="Task actions menu">
-              {onView && (
+              {onView && taskId && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onView(displayTask.id))}
+                  onClick={(e) => handleAction(e, () => onView(taskId))}
                 >
                   <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
                   <span>View Details</span>
                 </DropdownMenuItem>
               )}
-              {onStop && (displayTask.status === "IN_PROGRESS" || displayTask.status === "ITERATING") && (
+              {onStop && taskId && (displayTask.status === "IN_PROGRESS" || displayTask.status === "ITERATING") && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onStop(displayTask.id))}
+                  onClick={(e) => handleAction(e, () => onStop(taskId))}
                 >
                   <StopCircle className="mr-2 h-4 w-4" aria-hidden="true" />
                   <span>Stop Task</span>
                 </DropdownMenuItem>
               )}
               {(onView || onStop) && onDelete && <DropdownMenuSeparator />}
-              {onDelete && (
+              {onDelete && taskId && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onDelete(displayTask.id))}
+                  onClick={(e) => handleAction(e, () => onDelete(taskId))}
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -292,7 +295,7 @@ export function TaskCard({
               </div>
             )}
           </div>
-          <span className="font-mono text-xs">#{displayTask.id}</span>
+          <span className="font-mono text-xs">#{taskId}</span>
         </div>
 
         {/* Workflow name */}

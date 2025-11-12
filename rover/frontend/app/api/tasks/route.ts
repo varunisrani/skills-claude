@@ -113,12 +113,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<CreateTas
       yes: validatedData.yes ?? true, // Default to yes for API calls
     });
 
+    // Check if task was created even if result.success is false
+    // (e.g., task created but container initialization failed)
+    const taskData = result.data;
+
+    if (taskData && (taskData.id || taskData.taskId)) {
+      // Task was created successfully, even if there was a container error
+      // Return 201 with the task data
+      return createSuccessResponse(taskData, 201) as any;
+    }
+
     if (!result.success) {
       return handleRoverError(result as any, 'POST /api/tasks') as any;
     }
-
-    // result.data contains the parsed and validated TaskDescription
-    const taskData = result.data;
 
     if (!taskData) {
       return handleGenericError(

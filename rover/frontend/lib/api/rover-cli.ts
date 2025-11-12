@@ -126,7 +126,12 @@ export class RoverCLI {
       let killed = false;
 
       // Spawn the process (NOT exec - this prevents command injection)
-      const child: ChildProcess = spawn(this.roverPath, fullArgs, {
+      // Check if roverPath is a .js file - if so, use node to execute it
+      const isJsFile = this.roverPath.endsWith('.js');
+      const spawnArgs = isJsFile ? [this.roverPath, ...fullArgs] : fullArgs;
+      const spawnCommand = isJsFile ? 'node' : this.roverPath;
+
+      const child: ChildProcess = spawn(spawnCommand, spawnArgs, {
         cwd: this.cwd,
         env: this.env,
         // IMPORTANT: shell: false prevents command injection
@@ -180,7 +185,47 @@ export class RoverCLI {
           return;
         }
 
-        // Handle non-zero exit code
+        // Try to parse JSON output if requested (even on non-zero exit code)
+        if (options.parseJson && stdout.trim()) {
+          try {
+            const data = JSON.parse(stdout);
+
+            // Validate with schema if provided
+            if (options.schema) {
+              try {
+                const validated = options.schema.parse(data);
+                // Successfully parsed, return data even if exit code was non-zero
+                // (e.g., task created but container failed to initialize)
+                resolve({
+                  success: exitCode === 0,
+                  data: validated as T,
+                  error: exitCode !== 0 ? (data.error || this.sanitizeError(stderr || 'Command failed')) : undefined,
+                  stdout,
+                  stderr,
+                  exitCode: exitCode || 0,
+                });
+                return;
+              } catch (validationError) {
+                // Validation failed, fall through to non-JSON error handling
+              }
+            } else {
+              // No schema, return parsed data if we got JSON
+              resolve({
+                success: exitCode === 0,
+                data: data as T,
+                error: exitCode !== 0 ? (data.error || this.sanitizeError(stderr || 'Command failed')) : undefined,
+                stdout,
+                stderr,
+                exitCode: exitCode || 0,
+              });
+              return;
+            }
+          } catch (parseError) {
+            // JSON parse failed, fall through to standard error handling
+          }
+        }
+
+        // Handle non-zero exit code (when JSON parsing failed or wasn't requested)
         if (exitCode !== 0) {
           resolve({
             success: false,
@@ -192,7 +237,7 @@ export class RoverCLI {
           return;
         }
 
-        // Parse JSON output if requested
+        // Parse JSON output if requested and exit code was 0
         if (options.parseJson) {
           try {
             const data = JSON.parse(stdout);
@@ -594,6 +639,28 @@ export class RoverCLI {
 let roverCLIInstance: RoverCLI | null = null;
 
 /**
+ * Get the path to the built Rover CLI
+ * @returns Full path to the rover CLI executable
+ */
+export function getRoverCLIPath(): string {
+  const path = require('path');
+  // Use process.cwd() to get the current working directory during execution
+  // This should be the frontend directory when running npm run dev
+  // Then navigate up to rover root and into packages/cli/dist
+  const frontendDir = process.cwd();
+  // Check if we're already in frontend or rover directory
+  if (frontendDir.includes('rover/frontend') || frontendDir.includes('rover\\frontend')) {
+    // We're in frontend, go up to rover root
+    return path.join(frontendDir, '..', 'packages', 'cli', 'dist', 'index.js');
+  } else if (frontendDir.includes('/rover') || frontendDir.includes('\\rover')) {
+    // We're in rover root already
+    return path.join(frontendDir, 'packages', 'cli', 'dist', 'index.js');
+  }
+  // Fallback: assume we're in frontend
+  return path.join(frontendDir, '..', 'packages', 'cli', 'dist', 'index.js');
+}
+
+/**
  * Get or create a singleton RoverCLI instance
  *
  * @param options - Optional configuration for the CLI instance
@@ -601,7 +668,12 @@ let roverCLIInstance: RoverCLI | null = null;
  */
 export function getRoverCLI(options?: RoverCLIOptions): RoverCLI {
   if (!roverCLIInstance) {
-    roverCLIInstance = new RoverCLI(options);
+    // If no roverPath provided, use the built CLI path
+    const finalOptions: RoverCLIOptions = {
+      ...options,
+      roverPath: options?.roverPath || getRoverCLIPath(),
+    };
+    roverCLIInstance = new RoverCLI(finalOptions);
   }
   return roverCLIInstance;
 }

@@ -105,8 +105,17 @@ export function ShortcutsProvider({
     }
   }, [selectedTaskIndex, visibleTaskIds, router]);
 
+  // Memoize callback to prevent unnecessary re-renders
+  const handleCloseModal = useCallback(() => {
+    if (isCommandPaletteOpen) {
+      closeCommandPalette();
+    } else if (isHelpOpen) {
+      closeHelp();
+    }
+  }, [isCommandPaletteOpen, isHelpOpen, closeCommandPalette, closeHelp]);
+
   // Register global keyboard shortcuts
-  useKeyboardShortcuts([
+  const globalShortcuts = React.useMemo(() => [
     // Command palette
     {
       keys: shortcuts.COMMAND_PALETTE.keys,
@@ -122,13 +131,7 @@ export function ShortcutsProvider({
     // Close modals
     {
       keys: shortcuts.CLOSE_MODAL.keys,
-      callback: () => {
-        if (isCommandPaletteOpen) {
-          closeCommandPalette();
-        } else if (isHelpOpen) {
-          closeHelp();
-        }
-      },
+      callback: handleCloseModal,
       preventDefault: true,
       enabled: isCommandPaletteOpen || isHelpOpen,
     },
@@ -279,7 +282,25 @@ export function ShortcutsProvider({
       preventDefault: true,
       enabled: !isCommandPaletteOpen && !isHelpOpen,
     },
+  ], [
+    toggleCommandPalette,
+    toggleHelp,
+    handleCloseModal,
+    onCreateTask,
+    onRefreshTasks,
+    onFocusSearch,
+    onToggleDarkMode,
+    onOpenSettings,
+    selectPreviousTask,
+    selectNextTask,
+    openSelectedTask,
+    isCommandPaletteOpen,
+    isHelpOpen,
+    visibleTaskIds,
+    router,
   ]);
+
+  useKeyboardShortcuts(globalShortcuts);
 
   const value: ShortcutsContextValue = {
     isHelpOpen,
