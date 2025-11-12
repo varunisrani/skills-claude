@@ -10,6 +10,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/loading/LoadingSpinner';
 import { DiffViewer } from '@/components/diff/DiffViewer';
 import { useTaskDiffQuery } from '@/lib/hooks/useTaskDiff';
 import { useTaskQuery } from '@/lib/hooks/useTask';
@@ -35,10 +36,7 @@ export default function TaskDiffPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-zinc-50 mx-auto" />
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Loading diff...</p>
-        </div>
+        <LoadingSpinner size="lg" text="Loading diff..." />
       </div>
     );
   }

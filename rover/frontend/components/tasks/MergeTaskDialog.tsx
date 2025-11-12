@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { GitMerge, AlertTriangle } from 'lucide-react';
+import { GitMerge, AlertTriangle, Loader2 } from 'lucide-react';
 import { useMergeTaskMutation } from '@/lib/hooks';
 import { useToast } from '@/lib/hooks/use-toast';
 
@@ -73,7 +73,7 @@ export function MergeTaskDialog({ taskId, disabled }: MergeTaskDialogProps) {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Merge task changes form">
           <DialogHeader>
             <DialogTitle>Merge Task Changes</DialogTitle>
             <DialogDescription>
@@ -81,8 +81,8 @@ export function MergeTaskDialog({ taskId, disabled }: MergeTaskDialogProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900" role="alert">
+              <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                   This action cannot be undone
@@ -100,7 +100,8 @@ export function MergeTaskDialog({ taskId, disabled }: MergeTaskDialogProps) {
                 id="force"
                 checked={force}
                 onChange={(e) => setForce(e.target.checked)}
-                className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800"
+                className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-800"
+                aria-describedby={force ? "force-warning" : undefined}
               />
               <Label
                 htmlFor="force"
@@ -110,7 +111,7 @@ export function MergeTaskDialog({ taskId, disabled }: MergeTaskDialogProps) {
               </Label>
             </div>
             {force && (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
+              <p id="force-warning" className="text-xs text-amber-600 dark:text-amber-400" role="alert">
                 Warning: Force merge will override any conflicts automatically. Use with caution.
               </p>
             )}
@@ -127,7 +128,8 @@ export function MergeTaskDialog({ taskId, disabled }: MergeTaskDialogProps) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={mergeTask.isPending}>
+            <Button type="submit" disabled={mergeTask.isPending} aria-busy={mergeTask.isPending}>
+              {mergeTask.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {mergeTask.isPending ? 'Merging...' : 'Merge Changes'}
             </Button>
           </DialogFooter>

@@ -36,10 +36,13 @@ import { getFileWatcher, type WatchEvent } from '@/lib/api/file-watcher';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  // Await params in Next.js 16+
+  const { id } = await params;
+
   // Parse and validate task ID
-  const taskId = parseInt(params.id, 10);
+  const taskId = parseInt(id, 10);
 
   if (isNaN(taskId)) {
     return new Response(
@@ -102,8 +105,8 @@ export async function GET(
 
             console.log(`[SSE] Update sent for task ${taskId}:`, {
               iteration: event.iteration,
-              status: event.data.status,
-              progress: event.data.progress,
+              status: event.data?.status,
+              progress: event.data?.progress,
             });
           } catch (error) {
             console.error(`[SSE] Error sending update for task ${taskId}:`, error);

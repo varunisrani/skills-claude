@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { RotateCw } from 'lucide-react';
+import { RotateCw, Loader2 } from 'lucide-react';
 import { useIterateTaskMutation } from '@/lib/hooks';
 import { useToast } from '@/lib/hooks/use-toast';
 
@@ -74,7 +74,7 @@ export function IterateForm({ taskId }: IterateFormProps) {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Add iteration form">
           <DialogHeader>
             <DialogTitle>Add Iteration</DialogTitle>
             <DialogDescription>
@@ -83,7 +83,9 @@ export function IterateForm({ taskId }: IterateFormProps) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="instructions">Refinement Instructions</Label>
+              <Label htmlFor="instructions">
+                Refinement Instructions <span className="text-red-500" aria-label="required">*</span>
+              </Label>
               <Textarea
                 id="instructions"
                 placeholder="Describe what changes or improvements you want..."
@@ -93,8 +95,11 @@ export function IterateForm({ taskId }: IterateFormProps) {
                 required
                 minLength={10}
                 maxLength={2000}
+                aria-required="true"
+                aria-describedby="instructions-hint"
+                aria-invalid={instructions.length > 0 && instructions.length < 10 ? "true" : "false"}
               />
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p id="instructions-hint" className="text-xs text-zinc-500 dark:text-zinc-400">
                 Minimum 10 characters, maximum 2000
               </p>
             </div>
@@ -108,7 +113,8 @@ export function IterateForm({ taskId }: IterateFormProps) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={iterateTask.isPending}>
+            <Button type="submit" disabled={iterateTask.isPending} aria-busy={iterateTask.isPending}>
+              {iterateTask.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {iterateTask.isPending ? 'Starting...' : 'Start Iteration'}
             </Button>
           </DialogFooter>

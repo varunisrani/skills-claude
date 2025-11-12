@@ -9,12 +9,20 @@
  * - Input validation with Zod schemas
  * - Command injection prevention via spawn without shell
  * - Sanitized error messages
+ * - Centralized error handling
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getRoverCLI } from '@/lib/api/rover-cli';
 import { TaskIdSchema } from '@/lib/utils/validation';
 import { ZodError } from 'zod';
+import {
+  handleValidationError,
+  handleRoverError,
+  handleGenericError,
+  handleInvalidTaskId,
+  createSuccessResponse,
+} from '@/lib/api/api-error-handler';
 import type { GetTaskResponse, DeleteTaskResponse } from '@/types/api';
 
 /**
@@ -40,13 +48,7 @@ export async function GET(
       taskId = TaskIdSchema.parse(id);
     } catch (error) {
       if (error instanceof ZodError) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Invalid task ID. Must be a positive integer.',
-          },
-          { status: 400 }
-        );
+        return handleInvalidTaskId() as any;
       }
       throw error;
     }
@@ -56,54 +58,22 @@ export async function GET(
     const result = await roverCLI.inspectTask(taskId);
 
     if (!result.success) {
-      console.error('[API] Rover inspect failed:', result.error);
-
-      // Check for specific error messages
-      let errorMessage = 'Failed to retrieve task details.';
-      let statusCode = 500;
-
-      if (result.stderr?.includes('not found') || result.stderr?.includes('does not exist')) {
-        errorMessage = `Task ${taskId} not found.`;
-        statusCode = 404;
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorMessage,
-        },
-        { status: statusCode }
-      );
+      return handleRoverError(result as any, `GET /api/tasks/${taskId}`) as any;
     }
 
     // Return task data (already parsed and validated)
     const taskData = result.data;
 
     if (!taskData) {
-      console.error('[API] Task inspect succeeded but no data returned');
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Task data not available.',
-        },
-        { status: 500 }
-      );
+      return handleGenericError(
+        new Error('Task data not available'),
+        `GET /api/tasks/${taskId}`
+      ) as any;
     }
 
-    return NextResponse.json({
-      success: true,
-      data: taskData,
-    });
+    return createSuccessResponse(taskData) as any;
   } catch (error) {
-    console.error('[API] Error in GET /api/tasks/:id:', error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'An unexpected error occurred while retrieving the task.',
-      },
-      { status: 500 }
-    );
+    return handleGenericError(error, 'GET /api/tasks/:id') as any;
   }
 }
 
@@ -130,13 +100,7 @@ export async function DELETE(
       taskId = TaskIdSchema.parse(id);
     } catch (error) {
       if (error instanceof ZodError) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Invalid task ID. Must be a positive integer.',
-          },
-          { status: 400 }
-        );
+        return handleInvalidTaskId() as any;
       }
       throw error;
     }
@@ -146,45 +110,12 @@ export async function DELETE(
     const result = await roverCLI.deleteTask(taskId);
 
     if (!result.success) {
-      console.error('[API] Rover delete failed:', result.error);
-
-      // Check for specific error messages
-      let errorMessage = 'Failed to delete task.';
-      let statusCode = 500;
-
-      if (result.stderr?.includes('not found') || result.stderr?.includes('does not exist')) {
-        errorMessage = `Task ${taskId} not found.`;
-        statusCode = 404;
-      } else if (result.stderr?.includes('running') || result.stderr?.includes('in progress')) {
-        errorMessage = `Cannot delete task ${taskId} while it is running. Stop the task first.`;
-        statusCode = 409;
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorMessage,
-        },
-        { status: statusCode }
-      );
+      return handleRoverError(result as any, `DELETE /api/tasks/${taskId}`) as any;
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('[API] Error in DELETE /api/tasks/:id:', error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'An unexpected error occurred while deleting the task.',
-      },
-      { status: 500 }
-    );
+    return handleGenericError(error, 'DELETE /api/tasks/:id') as any;
   }
 }
 

@@ -16,6 +16,8 @@ import { CreateTaskRequestSchema, TaskWorkflow, TaskAgent } from "@/lib/utils/va
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 import type { Task } from "@/types/task"
+import { ApiErrorDisplay } from "@/components/error/ApiErrorDisplay"
+import { handleFetchError, handleError, type ApiError } from "@/lib/errors/error-handler"
 
 interface CreateTaskFormProps {
   onSuccess?: (task: Task) => void
@@ -26,6 +28,7 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [apiError, setApiError] = useState<ApiError | null>(null)
 
   const [formData, setFormData] = useState({
     description: "",
@@ -39,6 +42,7 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
+    setApiError(null)
     setIsSubmitting(true)
 
     try {
@@ -61,11 +65,19 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
         body: JSON.stringify(validatedData),
       })
 
-      const result = await response.json()
-
       if (!response.ok) {
-        throw new Error(result.error || "Failed to create task")
+        const error = await handleFetchError(response)
+        setApiError(error)
+
+        toast({
+          variant: "destructive",
+          title: "Error creating task",
+          description: error.userMessage,
+        })
+        return
       }
+
+      const result = await response.json()
 
       toast({
         title: "Task created successfully",
@@ -96,10 +108,13 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
         })
         setErrors(fieldErrors)
       } else {
+        const handledError = handleError(error, "CreateTaskForm")
+        setApiError(handledError)
+
         toast({
           variant: "destructive",
           title: "Error creating task",
-          description: error.message || "An unexpected error occurred",
+          description: handledError.userMessage,
         })
       }
     } finally {
@@ -120,11 +135,21 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-label="Create new task form">
+      {/* API Error Display */}
+      {apiError && (
+        <ApiErrorDisplay
+          error={apiError}
+          onRetry={() => {}}
+          isRetrying={isSubmitting}
+          showRetry={false}
+        />
+      )}
+
       {/* Description */}
       <div className="space-y-2">
         <Label htmlFor="description">
-          Task Description <span className="text-red-500">*</span>
+          Task Description <span className="text-red-500" aria-label="required">*</span>
         </Label>
         <Textarea
           id="description"
@@ -134,11 +159,16 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           className={errors.description ? "border-red-500" : ""}
           rows={6}
           required
+          aria-required="true"
+          aria-invalid={errors.description ? "true" : "false"}
+          aria-describedby={errors.description ? "description-error description-hint" : "description-hint"}
         />
         {errors.description && (
-          <p className="text-sm text-red-500">{errors.description}</p>
+          <p id="description-error" className="text-sm text-red-500" role="alert">
+            {errors.description}
+          </p>
         )}
-        <p className="text-xs text-zinc-500">
+        <p id="description-hint" className="text-xs text-zinc-500">
           {formData.description.length} / 5000 characters
         </p>
       </div>
@@ -150,7 +180,11 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           value={formData.workflow}
           onValueChange={(value) => handleChange("workflow", value)}
         >
-          <SelectTrigger id="workflow">
+          <SelectTrigger
+            id="workflow"
+            aria-invalid={errors.workflow ? "true" : "false"}
+            aria-describedby={errors.workflow ? "workflow-error" : undefined}
+          >
             <SelectValue placeholder="Select a workflow (optional)" />
           </SelectTrigger>
           <SelectContent>
@@ -159,7 +193,9 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           </SelectContent>
         </Select>
         {errors.workflow && (
-          <p className="text-sm text-red-500">{errors.workflow}</p>
+          <p id="workflow-error" className="text-sm text-red-500" role="alert">
+            {errors.workflow}
+          </p>
         )}
       </div>
 
@@ -170,7 +206,11 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           value={formData.agent}
           onValueChange={(value) => handleChange("agent", value)}
         >
-          <SelectTrigger id="agent">
+          <SelectTrigger
+            id="agent"
+            aria-invalid={errors.agent ? "true" : "false"}
+            aria-describedby={errors.agent ? "agent-error" : undefined}
+          >
             <SelectValue placeholder="Select an AI agent (optional)" />
           </SelectTrigger>
           <SelectContent>
@@ -183,7 +223,9 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           </SelectContent>
         </Select>
         {errors.agent && (
-          <p className="text-sm text-red-500">{errors.agent}</p>
+          <p id="agent-error" className="text-sm text-red-500" role="alert">
+            {errors.agent}
+          </p>
         )}
       </div>
 
@@ -196,9 +238,13 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           value={formData.sourceBranch}
           onChange={(e) => handleChange("sourceBranch", e.target.value)}
           className={errors.sourceBranch ? "border-red-500" : ""}
+          aria-invalid={errors.sourceBranch ? "true" : "false"}
+          aria-describedby={errors.sourceBranch ? "sourceBranch-error" : undefined}
         />
         {errors.sourceBranch && (
-          <p className="text-sm text-red-500">{errors.sourceBranch}</p>
+          <p id="sourceBranch-error" className="text-sm text-red-500" role="alert">
+            {errors.sourceBranch}
+          </p>
         )}
       </div>
 
@@ -211,9 +257,13 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           value={formData.targetBranch}
           onChange={(e) => handleChange("targetBranch", e.target.value)}
           className={errors.targetBranch ? "border-red-500" : ""}
+          aria-invalid={errors.targetBranch ? "true" : "false"}
+          aria-describedby={errors.targetBranch ? "targetBranch-error" : undefined}
         />
         {errors.targetBranch && (
-          <p className="text-sm text-red-500">{errors.targetBranch}</p>
+          <p id="targetBranch-error" className="text-sm text-red-500" role="alert">
+            {errors.targetBranch}
+          </p>
         )}
       </div>
 
@@ -226,9 +276,13 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           value={formData.fromGithub}
           onChange={(e) => handleChange("fromGithub", e.target.value)}
           className={errors.fromGithub ? "border-red-500" : ""}
+          aria-invalid={errors.fromGithub ? "true" : "false"}
+          aria-describedby={errors.fromGithub ? "fromGithub-error" : undefined}
         />
         {errors.fromGithub && (
-          <p className="text-sm text-red-500">{errors.fromGithub}</p>
+          <p id="fromGithub-error" className="text-sm text-red-500" role="alert">
+            {errors.fromGithub}
+          </p>
         )}
       </div>
 
@@ -244,8 +298,8 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
           {isSubmitting ? "Creating..." : "Create Task"}
         </Button>
       </div>

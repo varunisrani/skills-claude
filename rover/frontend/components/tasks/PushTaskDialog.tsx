@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, ExternalLink } from 'lucide-react';
+import { Upload, ExternalLink, Loader2 } from 'lucide-react';
 import { usePushTaskMutation } from '@/lib/hooks';
 import { useToast } from '@/lib/hooks/use-toast';
 
@@ -128,6 +128,7 @@ export function PushTaskDialog({ taskId, disabled }: PushTaskDialogProps) {
               Cancel
             </Button>
             <Button type="submit" disabled={pushTask.isPending}>
+              {pushTask.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {pushTask.isPending ? 'Pushing...' : 'Push Changes'}
             </Button>
           </DialogFooter>
