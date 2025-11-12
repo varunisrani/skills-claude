@@ -24,7 +24,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +33,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { TaskStatusBadge } from "./TaskStatusBadge"
+import { TaskStatusIndicator } from "./TaskStatusIndicator"
+import { TaskProgressBar } from "./TaskProgressBar"
+import { useTaskQuery } from "@/lib/hooks/useTask"
 import {
   MoreVertical,
   Eye,
@@ -43,7 +45,7 @@ import {
   Clock,
   Calendar
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import type { Task, TaskSummary } from "@/types/task"
 
 export interface TaskCardProps {
@@ -57,6 +59,8 @@ export interface TaskCardProps {
   onStop?: (taskId: number) => void
   /** Callback when view action is triggered */
   onView?: (taskId: number) => void
+  /** Enable real-time updates via polling for active tasks */
+  enableRealTimeUpdates?: boolean
   /** Additional CSS classes */
   className?: string
 }
@@ -124,30 +128,40 @@ export function TaskCard({
   onDelete,
   onStop,
   onView,
+  enableRealTimeUpdates = false,
   className
 }: TaskCardProps) {
-  const agentInfo = getAgentInfo(task.agent)
-  const progress = calculateProgress(task)
+  // Use real-time updates if enabled
+  const { data: liveTask } = useTaskQuery(task.id, {
+    enabled: enableRealTimeUpdates
+  })
+
+  // Use live task data if available, otherwise fall back to prop
+  const displayTask = liveTask || task
+
+  const agentInfo = getAgentInfo(displayTask.agent)
+  const progress = calculateProgress(displayTask)
   const showProgress = progress !== undefined && progress < 100
+  const isActive = displayTask.status === "IN_PROGRESS" || displayTask.status === "ITERATING"
 
   // Determine the timestamp to display (handle both Task and TaskSummary)
-  const displayTimestamp = ('completedAt' in task && task.completedAt)
-    || ('startedAt' in task && task.startedAt)
-    || ('updatedAt' in task && task.updatedAt)
-    || task.createdAt
-  const timestampLabel = ('completedAt' in task && task.completedAt)
+  const displayTimestamp = ('completedAt' in displayTask && displayTask.completedAt)
+    || ('startedAt' in displayTask && displayTask.startedAt)
+    || ('updatedAt' in displayTask && displayTask.updatedAt)
+    || displayTask.createdAt
+  const timestampLabel = ('completedAt' in displayTask && displayTask.completedAt)
     ? "Completed"
-    : ('startedAt' in task && task.startedAt)
+    : ('startedAt' in displayTask && displayTask.startedAt)
     ? "Started"
-    : ('updatedAt' in task && task.updatedAt)
+    : ('updatedAt' in displayTask && displayTask.updatedAt)
     ? "Updated"
     : "Created"
 
   const handleCardClick = () => {
     if (onClick) {
-      onClick(task)
+      onClick(displayTask)
     } else if (onView) {
-      onView(task.id)
+      onView(displayTask.id)
     }
   }
 
@@ -167,20 +181,27 @@ export function TaskCard({
       )}
       onClick={handleCardClick}
       role="article"
-      aria-label={`Task: ${task.title}`}
+      aria-label={`Task: ${displayTask.title}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <TaskStatusBadge status={task.status} showIcon />
+            <div className="flex items-center gap-3 mb-2">
+              {/* Live status indicator with pulsing animation */}
+              <TaskStatusIndicator
+                status={displayTask.status}
+                showLabel
+                size="sm"
+              />
+              {/* Legacy badge for compatibility */}
+              <TaskStatusBadge status={displayTask.status} className="hidden" />
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Bot className={cn("h-3 w-3", agentInfo.color)} aria-hidden="true" />
                 <span>{agentInfo.name}</span>
               </div>
             </div>
             <CardTitle className="text-lg leading-tight truncate">
-              {task.title}
+              {displayTask.title}
             </CardTitle>
           </div>
 
@@ -198,15 +219,15 @@ export function TaskCard({
             <DropdownMenuContent align="end">
               {onView && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onView(task.id))}
+                  onClick={(e) => handleAction(e, () => onView(displayTask.id))}
                 >
                   <Eye className="mr-2 h-4 w-4" />
                   <span>View Details</span>
                 </DropdownMenuItem>
               )}
-              {onStop && (task.status === "IN_PROGRESS" || task.status === "ITERATING") && (
+              {onStop && (displayTask.status === "IN_PROGRESS" || displayTask.status === "ITERATING") && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onStop(task.id))}
+                  onClick={(e) => handleAction(e, () => onStop(displayTask.id))}
                 >
                   <StopCircle className="mr-2 h-4 w-4" />
                   <span>Stop Task</span>
@@ -215,7 +236,7 @@ export function TaskCard({
               {(onView || onStop) && onDelete && <DropdownMenuSeparator />}
               {onDelete && (
                 <DropdownMenuItem
-                  onClick={(e) => handleAction(e, () => onDelete(task.id))}
+                  onClick={(e) => handleAction(e, () => onDelete(displayTask.id))}
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -226,23 +247,23 @@ export function TaskCard({
           </DropdownMenu>
         </div>
 
-        {'description' in task && task.description && (
+        {'description' in displayTask && displayTask.description && (
           <CardDescription className="line-clamp-2 text-sm">
-            {truncateText(task.description, 150)}
+            {truncateText(displayTask.description, 150)}
           </CardDescription>
         )}
       </CardHeader>
 
       <CardContent className="space-y-3">
-        {/* Progress bar for in-progress tasks */}
-        {showProgress && (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Progress</span>
-              <span>{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" aria-label="Task progress" />
-          </div>
+        {/* Progress bar for active and completed tasks */}
+        {(isActive || showProgress) && (
+          <TaskProgressBar
+            status={displayTask.status}
+            value={isActive && !showProgress ? undefined : progress}
+            showPercentage={showProgress}
+            showLabel={false}
+            size="sm"
+          />
         )}
 
         {/* Metadata row */}
@@ -254,20 +275,20 @@ export function TaskCard({
                 {formatDistanceToNow(new Date(displayTimestamp), { addSuffix: true })}
               </span>
             </div>
-            {task.iterations > 1 && (
+            {displayTask.iterations > 1 && (
               <div className="flex items-center gap-1" title="Iterations">
                 <Calendar className="h-3 w-3" aria-hidden="true" />
-                <span>{task.iterations} iterations</span>
+                <span>{displayTask.iterations} iterations</span>
               </div>
             )}
           </div>
-          <span className="font-mono text-xs">#{task.id}</span>
+          <span className="font-mono text-xs">#{displayTask.id}</span>
         </div>
 
         {/* Workflow name */}
         <div className="flex items-center gap-1 text-xs">
           <span className="text-muted-foreground">Workflow:</span>
-          <span className="font-medium capitalize">{task.workflowName}</span>
+          <span className="font-medium capitalize">{displayTask.workflowName}</span>
         </div>
       </CardContent>
     </Card>
