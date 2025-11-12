@@ -26,6 +26,8 @@ export {
   useStopTaskMutation,
   useRestartTaskMutation,
   useIterateTaskMutation,
+  useMergeTaskMutation,
+  usePushTaskMutation,
 } from './useTask';
 
 // Task logs
@@ -56,3 +58,12 @@ export {
   type TaskStreamOptions,
   type TaskStreamResult,
 } from './useTaskStream';
+
+// Task iterations
+export {
+  useTaskIterationsQuery,
+  useIterationDetailQuery,
+  useLatestIterationQuery,
+  useHasIterationsQuery,
+  iterationKeys,
+} from './useTaskIterations';

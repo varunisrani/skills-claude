@@ -14,7 +14,9 @@ import { Separator } from '@/components/ui/separator';
 import { TaskStatusBadge } from '@/components/tasks/TaskStatusBadge';
 import { IterationList } from '@/components/iterations/IterationList';
 import { IterateForm } from '@/components/iterations/IterateForm';
-import { useTaskQuery, useDeleteTaskMutation, useStopTaskMutation, useRestartTaskMutation } from '@/lib/hooks';
+import { MergeTaskDialog } from '@/components/tasks/MergeTaskDialog';
+import { PushTaskDialog } from '@/components/tasks/PushTaskDialog';
+import { useTaskQuery, useDeleteTaskMutation, useStopTaskMutation, useRestartTaskMutation, useTaskIterationsQuery } from '@/lib/hooks';
 import { useToast } from '@/lib/hooks/use-toast';
 import {
   FileText,
@@ -22,8 +24,6 @@ import {
   Play,
   Square,
   Trash2,
-  GitMerge,
-  Upload,
   ArrowLeft,
   Clock,
   GitBranch,
@@ -43,14 +43,12 @@ export default function TaskDetailPage() {
   const restartTaskMutation = useRestartTaskMutation();
   const { toast } = useToast();
 
-  // TODO: Add useTaskIterationsMutation, useMergeTaskMutation, usePushTaskMutation
-  const iterations: any[] = [];
-  const iterationsLoading = false;
+  // Fetch iterations
+  const { data: iterations = [], isLoading: iterationsLoading } = useTaskIterationsQuery(taskId);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [showStopConfirm, setShowStopConfirm] = React.useState(false);
   const [showRestartConfirm, setShowRestartConfirm] = React.useState(false);
-  const [showMergeConfirm, setShowMergeConfirm] = React.useState(false);
 
   const handleDelete = () => {
     deleteTaskMutation.mutate(taskId, {
@@ -86,17 +84,6 @@ export default function TaskDetailPage() {
         toast({ variant: 'destructive', title: 'Error', description: error.message });
       },
     });
-  };
-
-  const handleMerge = () => {
-    // TODO: Implement useMergeTaskMutation
-    toast({ variant: 'destructive', title: 'Error', description: 'Merge functionality not yet implemented' });
-    setShowMergeConfirm(false);
-  };
-
-  const handlePush = () => {
-    // TODO: Implement usePushTaskMutation
-    toast({ variant: 'destructive', title: 'Error', description: 'Push functionality not yet implemented' });
   };
 
   if (taskLoading) {
@@ -239,26 +226,8 @@ export default function TaskDetailPage() {
                 Stop
               </Button>
             )}
-            {canMerge && (
-              <Button
-                variant="outline"
-                onClick={() => setShowMergeConfirm(true)}
-                disabled={false}
-              >
-                <GitMerge className="mr-2 h-4 w-4" />
-                Merge
-              </Button>
-            )}
-            {canPush && (
-              <Button
-                variant="outline"
-                onClick={handlePush}
-                disabled={false}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Push
-              </Button>
-            )}
+            {canMerge && <MergeTaskDialog taskId={taskId} disabled={false} />}
+            {canPush && <PushTaskDialog taskId={taskId} disabled={false} />}
             <Button
               variant="destructive"
               onClick={() => setShowDeleteConfirm(true)}
@@ -346,27 +315,6 @@ export default function TaskDetailPage() {
               </Button>
               <Button onClick={handleRestart} disabled={restartTaskMutation.isPending}>
                 {restartTaskMutation.isPending ? 'Restarting...' : 'Restart'}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {showMergeConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Merge Task</CardTitle>
-              <CardDescription>
-                Are you sure you want to merge this task's changes?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowMergeConfirm(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleMerge}>
-                Merge
               </Button>
             </CardContent>
           </Card>
