@@ -49,3 +49,10 @@ export {
   type ParsedDiff,
   type DiffHunk,
 } from './useTaskDiff';
+
+// Task streaming (SSE)
+export {
+  useTaskStream,
+  type TaskStreamOptions,
+  type TaskStreamResult,
+} from './useTaskStream';
