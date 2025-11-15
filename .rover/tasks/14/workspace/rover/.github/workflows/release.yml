@@ -1,0 +1,178 @@
+name: Release
+run-name: (${{ github.event.inputs.project }}) Release ${{ github.event.inputs.targetVersion }} from ${{ github.ref_name }}
+
+concurrency: production
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Select the project to release'
+        required: true
+        type: choice
+        default: cli
+        options:
+          - cli
+          - extension
+      targetVersion:
+        description: 'Version to publish (e.g. 1.0.0)'
+        type: string
+        required: true
+      publishRelease:
+        description: 'Trigger the publisher Job after a successful release to publish artifacts to remote registries (VSCode, NPM, ...)'
+        required: true
+        type: boolean
+        default: false
+      dryRun:
+        description: 'Dry-run job to avoid commiting changes and publishing'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    timeout-minutes: 15
+    environment: production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Echo inputs
+        run: |
+          echo "Project: $PROJECT"
+          echo "Version: $VERSION"
+          echo "Publish: $PUBLISH"
+          echo "Dry Run: $DRY_RUN"
+        env:
+          PROJECT: ${{ inputs.project }}
+          VERSION: ${{ inputs.targetVersion }}
+          PUBLISH: ${{ inputs.publishRelease }}
+          DRY_RUN: ${{ inputs.dryRun }}
+
+      - name: Clone
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Bump Version
+        run: npm version ${{ inputs.targetVersion }}
+        working-directory: ./packages/${{ inputs.project }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check
+        run: npm run check:${{ inputs.project }}
+
+      - name: Test
+        # For now, skip tests on the VSCode Extension
+        if: inputs.project == 'cli'
+        run: npm run test:${{ inputs.project }}
+
+      - name: Build
+        run: npm run build:${{ inputs.project }}
+
+      - name: Package
+        run: npm run package:${{ inputs.project }}
+
+      - name: (Dry Run) Commit and tag
+        if: inputs.dryRun == true
+        run: echo "Skipping commit and tag phase."
+
+      - name: Commit and tag
+        if: inputs.dryRun == false
+        id: commit
+        env:
+          REPO_NAME: 'rover'
+          VERSION: '${{ inputs.targetVersion }}'
+          PROJECT: '${{ inputs.project }}'
+          TAG_NAME: '${{ inputs.project }}/v${{ inputs.targetVersion }}'
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add .
+          git commit -m "bump: update $PROJECT to $VERSION"
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+          echo "Created commit: $COMMIT_SHA"
+          git tag -a "$TAG_NAME" -m "$TAG_NAME"
+          git push
+          git push --tags
+
+      - name: (Dry Run) Create the release
+        if: inputs.dryRun == true
+        run: echo "Skipping create release phase."
+
+      - name: Create the release
+        if: inputs.dryRun == false
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: '${{ inputs.project }}/v${{ inputs.targetVersion }}'
+        run: |
+          # Find the artifact based on the project type
+          if [ "${{ inputs.project }}" == "cli" ]; then
+            ARTIFACT=$(find ./packages/cli -name "*.tgz" -type f | head -1)
+          elif [ "${{ inputs.project }}" == "extension" ]; then
+            ARTIFACT=$(find ./packages/extension -name "*.vsix" -type f | head -1)
+          fi
+
+          # Create release with artifact
+          gh release create "$TAG_NAME" \
+            --title "${{ inputs.project }} v${{ inputs.targetVersion }}" \
+            --generate-notes \
+            --target "${{ env.COMMIT_SHA }}" \
+            "$ARTIFACT"
+
+      - name: Notify Google Chat on Success
+        if: success() && inputs.dryRun == false
+        env:
+          WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          PROJECT: ${{ inputs.project }}
+          VERSION: ${{ inputs.targetVersion }}
+          TAG_NAME: '${{ inputs.project }}/v${{ inputs.targetVersion }}'
+          RELEASE_URL: 'https://github.com/${{ github.repository }}/releases/tag/${{ inputs.project }}/v${{ inputs.targetVersion }}'
+        run: |
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "text": "🚀 *New Release Published*\n\n*Project:* ${PROJECT}\n*Version:* v${VERSION}\n*Tag:* ${TAG_NAME}\n*Release URL:* ${RELEASE_URL}\n*Repository:* ${{ github.repository }}\n*Released by:* ${{ github.actor }}"
+          }
+          EOF
+
+      - name: Notify Google Chat on Failure
+        if: failure() && inputs.dryRun == false
+        env:
+          WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          PROJECT: ${{ inputs.project }}
+          VERSION: ${{ inputs.targetVersion }}
+          WORKFLOW_URL: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        run: |
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "text": "❌ *Release Failed*\n\n*Project:* ${PROJECT}\n*Version:* v${VERSION}\n*Repository:* ${{ github.repository }}\n*Failed by:* ${{ github.actor }}\n*Workflow Run:* ${WORKFLOW_URL}\n\nPlease check the workflow logs for details."
+          }
+          EOF
+
+      - name: Trigger Publish Workflow
+        if: success() && inputs.publishRelease == true && inputs.dryRun == false
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "⚠️  Manual action required: Please run the publish workflow manually"
+          echo "Navigate to Actions > Publish workflow and run with:"
+          echo "  - Project: ${{ inputs.project }}"
+          echo "  - Version: ${{ inputs.targetVersion }}"
+          echo "  - Dry Run: ${{ inputs.dryRun }}"
+          # gh workflow run publish.yml \
+          #   --repo ${{ github.repository }} \
+          #   --ref ${{ github.ref }} \
+          #   -f project=${{ inputs.project }} \
+          #   -f version=${{ inputs.targetVersion }} \
+          #   -f dryRun=${{ inputs.dryRun }}

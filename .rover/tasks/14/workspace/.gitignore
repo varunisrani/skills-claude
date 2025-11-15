@@ -1,0 +1,11 @@
+.claude/projects/
+.claude/history.jsonl
+.claude/debug/
+.claude/shell-snapshots/
+.claude/.credentials.json
+.claude/commands/
+.claude/statsig/
+.env
+.env.local
+node_modules/
+__pycache__/
