@@ -1,0 +1,170 @@
+.card {
+  display: block;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #0969da;
+  transform: translateY(-2px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1;
+}
+
+.title h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+  color: #1f2328;
+}
+
+.state {
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.stateOpen {
+  color: #1a7f37;
+}
+
+.stateClosed {
+  color: #8250df;
+}
+
+.number {
+  color: #656d76;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.body {
+  font-size: 14px;
+  color: #656d76;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #656d76;
+}
+
+.author {
+  font-weight: 500;
+}
+
+.date {
+  color: #8b949e;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comments {
+  color: #656d76;
+  font-weight: 500;
+}
+
+.labels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.label {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+
+  .card:hover {
+    border-color: #58a6ff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .title h3 {
+    color: #c9d1d9;
+  }
+
+  .body {
+    color: #8b949e;
+  }
+
+  .number,
+  .meta,
+  .comments {
+    color: #8b949e;
+  }
+
+  .date {
+    color: #6e7681;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .card {
+    padding: 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .title h3 {
+    font-size: 15px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
