@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 200px;
+}
+
+.content {
+  max-width: 500px;
+  text-align: center;
+  padding: 32px;
+  background-color: #fff0f0;
+  border: 1px solid #ff818266;
+  border-radius: 8px;
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #cf222e;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #cf222e;
+}
+
+.message {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #82071e;
+  margin: 0 0 20px 0;
+}
+
+.retryBtn {
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: #cf222e;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retryBtn:hover {
+  background-color: #a40e26;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .content {
+    background-color: #2d0b0e;
+    border-color: #ff7b7233;
+  }
+
+  .icon {
+    color: #ff7b72;
+  }
+
+  .title {
+    color: #ff7b72;
+  }
+
+  .message {
+    color: #ffdcd7;
+  }
+
+  .retryBtn {
+    background-color: #da3633;
+  }
+
+  .retryBtn:hover {
+    background-color: #ff7b72;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .content {
+    padding: 24px;
+  }
+
+  .icon {
+    font-size: 36px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+}

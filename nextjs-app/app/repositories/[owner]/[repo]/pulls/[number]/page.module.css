@@ -1,0 +1,509 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.breadcrumbLink {
+  color: #0969da;
+  text-decoration: none;
+}
+
+.breadcrumbLink:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+  color: #656d76;
+}
+
+.breadcrumbCurrent {
+  color: #1f2328;
+  font-weight: 600;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.titleRow {
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0;
+  color: #1f2328;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.number {
+  color: #656d76;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: #656d76;
+  margin-bottom: 12px;
+}
+
+.state {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.stateOpen {
+  background-color: #dafbe1;
+  color: #1a7f37;
+}
+
+.stateClosed {
+  background-color: #ffebe9;
+  color: #cf222e;
+}
+
+.stateMerged {
+  background-color: #e4e2f0;
+  color: #8250df;
+}
+
+.author {
+  font-weight: 400;
+}
+
+.branch {
+  padding: 2px 6px;
+  background-color: #ddf4ff;
+  color: #0969da;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.labels {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+}
+
+.mainSection {
+  min-width: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebarSection {
+  padding: 16px;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+}
+
+.sidebarTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #1f2328;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.statLabel {
+  color: #656d76;
+}
+
+.statValue {
+  font-weight: 600;
+  color: #1f2328;
+}
+
+.additions {
+  color: #1a7f37;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.deletions {
+  color: #cf222e;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.prBody,
+.comment {
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background-color: #ffffff;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: #f6f8fa;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.commentMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.commentAuthor {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2328;
+}
+
+.commentDate {
+  font-size: 12px;
+  color: #656d76;
+}
+
+.commentBody {
+  padding: 16px;
+}
+
+.bodyText {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1f2328;
+}
+
+.noDescription {
+  margin: 0;
+  color: #656d76;
+  font-style: italic;
+}
+
+.diffSection {
+  margin-bottom: 24px;
+}
+
+.comments {
+  margin-bottom: 24px;
+}
+
+.commentsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #1f2328;
+}
+
+.newComment {
+  margin-top: 24px;
+}
+
+.mergeSection {
+  padding: 16px;
+  background-color: #dafbe1;
+  border: 1px solid #1a7f37;
+  border-radius: 8px;
+}
+
+.mergeBtn {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: #1f883d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mergeBtn:hover:not(:disabled) {
+  background-color: #1a7f37;
+}
+
+.mergeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mergeError {
+  padding: 12px;
+  background-color: #fff0f0;
+  border: 1px solid #ff818266;
+  border-radius: 6px;
+  color: #cf222e;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.mergedInfo {
+  padding: 16px;
+  background-color: #e4e2f0;
+  border: 1px solid #8250df;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2328;
+}
+
+.mergedInfo p {
+  margin: 0 0 8px 0;
+}
+
+.mergedInfo p:last-child {
+  margin: 0;
+}
+
+.mergedDate {
+  color: #656d76;
+  font-size: 13px;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 16px;
+}
+
+.loading {
+  color: #656d76;
+}
+
+.error {
+  color: #cf222e;
+  background-color: #fff0f0;
+  border: 1px solid #ff818266;
+  border-radius: 8px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .breadcrumbLink {
+    color: #58a6ff;
+  }
+
+  .breadcrumbCurrent {
+    color: #c9d1d9;
+  }
+
+  .title {
+    color: #c9d1d9;
+  }
+
+  .number {
+    color: #8b949e;
+  }
+
+  .meta {
+    color: #8b949e;
+  }
+
+  .stateOpen {
+    background-color: #1f6f3d;
+    color: #7ee787;
+  }
+
+  .stateClosed {
+    background-color: #6e1417;
+    color: #ff7b72;
+  }
+
+  .stateMerged {
+    background-color: #493d6e;
+    color: #d2a8ff;
+  }
+
+  .branch {
+    background-color: #1c2d41;
+    color: #58a6ff;
+  }
+
+  .sidebarSection {
+    background-color: #161b22;
+    border-color: #30363d;
+  }
+
+  .sidebarTitle {
+    color: #c9d1d9;
+  }
+
+  .statLabel {
+    color: #8b949e;
+  }
+
+  .statValue {
+    color: #c9d1d9;
+  }
+
+  .additions {
+    color: #7ee787;
+  }
+
+  .deletions {
+    color: #ff7b72;
+  }
+
+  .prBody,
+  .comment {
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+
+  .commentHeader {
+    background-color: #161b22;
+    border-color: #30363d;
+  }
+
+  .commentAuthor {
+    color: #c9d1d9;
+  }
+
+  .commentDate {
+    color: #8b949e;
+  }
+
+  .bodyText {
+    color: #c9d1d9;
+  }
+
+  .noDescription {
+    color: #8b949e;
+  }
+
+  .commentsTitle {
+    color: #c9d1d9;
+  }
+
+  .mergeSection {
+    background-color: #1f6f3d;
+    border-color: #238636;
+  }
+
+  .mergeBtn {
+    background-color: #238636;
+  }
+
+  .mergeBtn:hover:not(:disabled) {
+    background-color: #2ea043;
+  }
+
+  .mergeError {
+    background-color: #2d0b0e;
+    border-color: #ff7b7233;
+    color: #ff7b72;
+  }
+
+  .mergedInfo {
+    background-color: #493d6e;
+    border-color: #8250df;
+    color: #c9d1d9;
+  }
+
+  .mergedDate {
+    color: #8b949e;
+  }
+
+  .loading {
+    color: #8b949e;
+  }
+
+  .error {
+    background-color: #2d0b0e;
+    border-color: #ff7b7233;
+    color: #ff7b72;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .number {
+    font-size: 20px;
+  }
+
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
