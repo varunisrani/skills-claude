@@ -26,7 +26,7 @@ class MCPStateServer {
         // Create single MCP server instance
         this.mcpServer = new Server(
             {
-                name: "test-state-server",
+                name: "vict-state-server",
                 version: "0.1.0",
             },
             {
@@ -118,7 +118,7 @@ class MCPStateServer {
     public start(): Promise<void> {
         return new Promise((resolve) => {
             this.server = this.app.listen(this.port, () => {
-                logger.debug(`testState MCP Server running on port ${this.port}`);
+                logger.debug(`VICT State MCP Server running on port ${this.port}`);
                 resolve();
             });
         });

@@ -41,7 +41,7 @@ RUN bun run build
 FROM base AS prod
 
 # Copy dist
-COPY --from=build /app/cli/dist/cc-test-runner /app/cc-test-runner
+COPY --from=build /app/cli/dist/vict-runner /app/vict-runner
 WORKDIR /app
 
 # Start built CLI

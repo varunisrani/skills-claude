@@ -16,9 +16,9 @@ interface CLIOptions {
 const program = new Command()
     .requiredOption("-t, --testsPath <path>", "Path to the tests file")
     .option("-o, --resultsPath <path>", "Path to the results file", `./results/${new Date().getMilliseconds()}`)
-    .option("-v, --verbose", "Verbose output, including all Claude Code messages.")
+    .option("-v, --verbose", "Verbose output, including all VICT messages.")
     .option("-s, --screenshots", "Take screenshots of the browser at each step.")
-    .option("--maxTurns <turns>", "Maximum number of turns Claude Code can take for each test case.", "30")
+    .option("--maxTurns <turns>", "Maximum number of turns VICT can take for each test case.", "30")
     .option("-m, --model <model>", "The model to use for the test run.")
     .parse(process.argv);
 

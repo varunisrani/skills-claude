@@ -16,14 +16,14 @@ export const startTest = (testCase: TestCase) => {
         throw new Error("Claude not found on PATH. Did you run `bun install`?");
     }
     return query({
-        prompt: "Query the test plan from mcp__testState__get_test_plan MCP tool to get started.",
+        prompt: "Query the test plan from mcp__vict-state__get_test_plan MCP tool to get started.",
         options: {
             customSystemPrompt: systemPrompt(),
             maxTurns: inputs.maxTurns,
             pathToClaudeCodeExecutable: claudePath,
             model: inputs.model,
             mcpServers: {
-                "cctr-playwright": {
+                "vict-playwright": {
                     command: "bunx",
                     args: [
                         "@playwright/mcp@v0.0.31",
@@ -34,7 +34,7 @@ export const startTest = (testCase: TestCase) => {
                         "omit",
                     ],
                 },
-                "cctr-state": {
+                "vict-state": {
                     type: "http",
                     url: "http://localhost:3001/",
                     headers: {
@@ -44,33 +44,33 @@ export const startTest = (testCase: TestCase) => {
             },
             allowedTools: [
                 // Playwright MCP tools for interacting with the browser
-                "mcp__cctr-playwright__browser_close",
-                "mcp__cctr-playwright__browser_resize",
-                "mcp__cctr-playwright__browser_console_messages",
-                "mcp__cctr-playwright__browser_handle_dialog",
-                "mcp__cctr-playwright__browser_evaluate",
-                "mcp__cctr-playwright__browser_file_upload",
-                "mcp__cctr-playwright__browser_install",
-                "mcp__cctr-playwright__browser_press_key",
-                "mcp__cctr-playwright__browser_type",
-                "mcp__cctr-playwright__browser_navigate",
-                "mcp__cctr-playwright__browser_navigate_back",
-                "mcp__cctr-playwright__browser_navigate_forward",
-                "mcp__cctr-playwright__browser_network_requests",
-                "mcp__cctr-playwright__browser_snapshot",
-                "mcp__cctr-playwright__browser_click",
-                "mcp__cctr-playwright__browser_drag",
-                "mcp__cctr-playwright__browser_hover",
-                "mcp__cctr-playwright__browser_select_option",
-                "mcp__cctr-playwright__browser_tab_list",
-                "mcp__cctr-playwright__browser_tab_new",
-                "mcp__cctr-playwright__browser_tab_select",
-                "mcp__cctr-playwright__browser_tab_close",
-                "mcp__cctr-playwright__browser_take_screenshot",
-                "mcp__cctr-playwright__browser_wait_for",
+                "mcp__vict-playwright__browser_close",
+                "mcp__vict-playwright__browser_resize",
+                "mcp__vict-playwright__browser_console_messages",
+                "mcp__vict-playwright__browser_handle_dialog",
+                "mcp__vict-playwright__browser_evaluate",
+                "mcp__vict-playwright__browser_file_upload",
+                "mcp__vict-playwright__browser_install",
+                "mcp__vict-playwright__browser_press_key",
+                "mcp__vict-playwright__browser_type",
+                "mcp__vict-playwright__browser_navigate",
+                "mcp__vict-playwright__browser_navigate_back",
+                "mcp__vict-playwright__browser_navigate_forward",
+                "mcp__vict-playwright__browser_network_requests",
+                "mcp__vict-playwright__browser_snapshot",
+                "mcp__vict-playwright__browser_click",
+                "mcp__vict-playwright__browser_drag",
+                "mcp__vict-playwright__browser_hover",
+                "mcp__vict-playwright__browser_select_option",
+                "mcp__vict-playwright__browser_tab_list",
+                "mcp__vict-playwright__browser_tab_new",
+                "mcp__vict-playwright__browser_tab_select",
+                "mcp__vict-playwright__browser_tab_close",
+                "mcp__vict-playwright__browser_take_screenshot",
+                "mcp__vict-playwright__browser_wait_for",
                 // Custom MCP tools for managing the test state
-                "mcp__cctr-state__get_test_plan",
-                "mcp__cctr-state__update_test_step",
+                "mcp__vict-state__get_test_plan",
+                "mcp__vict-state__update_test_step",
             ],
         },
     });

@@ -14,7 +14,7 @@ bun install
 echo "Installing Chrome browser for Playwright..."
 bunx playwright install chrome
 
-echo "Installing Claude Code..."
+echo "Installing VICT dependencies..."
 bun install -g @anthropic-ai/claude-code
 
 echo "Finished init.dev.sh!"
