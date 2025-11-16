@@ -1,26 +1,28 @@
-# Claude Code Test Runner
+# Varun Israni Claude Tester (VICT)
 
-This project enables full E2E test automation using Claude Code.
+> Created by **Varun Israni** - AI-Powered E2E Test Automation Framework
+
+This project enables full E2E test automation using Claude Code powered by VICT.
 
 Tests are defined using simple natural language steps.
 Claude Code performs these steps sequentially in a browser through the Playwright MCP,
 making decisions about element selection, timing,
 and validation based on the test descriptions.
 
-## Why Claude Code as a test runner?
+## Why VICT as a test runner?
 
 Professional software engineers have been successfully writing automated tests for decades.
 With the introduction of tools like Claude Code, traditional tests can be written even faster.
-Why would anyone use Claude Code as a test runner?
+Why would anyone use VICT as a test runner?
 
 First, this test runner was not made to replace traditional unit, integration, or manual testing strategies.
 It is meant to bolster confidence in the final end-to-end experience of your web application.
-Ideally, the Claude Code Test Runner sits somewhere between traditional automated E2E tests
+Ideally, VICT sits somewhere between traditional automated E2E tests
 and manual E2E sanity tests.
 
 ### Claude Code can execute tests like a real human
 
-Imagine performing manual E2E tests with human-like intuition dozens or hundreds of times each day. That's what Claude Code Test Runner can deliver.
+Imagine performing manual E2E tests with human-like intuition dozens or hundreds of times each day. That's what VICT can deliver.
 
 - **Natural language test definitions**: Tests describe what to test rather than how to test it
 - **Visual understanding**: Can validate UI states based on visual appearance
@@ -46,11 +48,11 @@ where a lot can go wrong.
 
 Tests are defined in JSON using sequential, natural language steps.
 The expected schema is a JSON array of [TestCase](cli/src/types/test-case.ts) objects.
-See [samples/thisinto-e2e-tests.json](samples/thisinto-e2e-tests.json) for a concrete example.
+See [samples/vict-sample-tests.json](samples/vict-sample-tests.json) for a concrete example.
 
 ### CLI
 
-This project includes a CLI tool, `cc-test-runner`.
+This project includes a CLI tool, `vict-runner`.
 
 #### Building the CLI Tool
 
@@ -61,7 +63,7 @@ Build the CLI: `bun run build`
 #### Running the CLI Tool
 
 ```bash
-./dist/cc-test-runner [options]
+./dist/vict-runner [options]
 ```
 
 | Argument | Alias | Type | Required | Default | Description |
@@ -77,13 +79,13 @@ Build the CLI: `bun run build`
 
 ```bash
 # Basic usage with test file
-./dist/cc-test-runner --testsPath=./tests.json
+./dist/vict-runner --testsPath=./tests.json
 
 # With custom results directory and verbose output
-./dist/cc-test-runner -t ./e2e-tests.json -o ./test-output -v
+./dist/vict-runner -t ./e2e-tests.json -o ./test-output -v
 
 # Limit Claude Code interactions
-./dist/cc-test-runner --testsPath=./tests.json --maxTurns=20
+./dist/vict-runner --testsPath=./tests.json --maxTurns=20
 ```
 
 ### Docker Image + GitHub Actions
@@ -108,16 +110,16 @@ The results directory for each test run contains the following:
 ```mermaid
 graph LR
     subgraph Host
-        subgraph CLI
-            RUNNER["Test Runner"]
+        subgraph VICT
+            RUNNER["VICT Test Runner"]
             SDK["Claude Code SDK"]
-            STATE["Test State MCP (custom)"]
+            STATE["VICT State MCP (custom)"]
         end
         MCP["Playwright MCP"]
         Browser["Sandbox Chrome Browser"]
     end
     API["Anthropic API"]
-    
+
     RUNNER -->|1 Posts steps for test| STATE
     RUNNER -->|2 Starts test run| SDK
     STATE -->|4 Gets final state| RUNNER
@@ -125,7 +127,7 @@ graph LR
     SDK -->|3c Updates steps| STATE
     SDK <-->|3b Browser instrumentation & feedback| MCP
     MCP -->|Instruments| Browser
-    
+
     style RUNNER fill:#bfb,stroke:#333,stroke-width:2px,color:#000
     style SDK fill:#f9f,stroke:#333,stroke-width:2px,color:#000
     style API fill:#ff9,stroke:#333,stroke-width:2px,color:#000
@@ -136,16 +138,16 @@ graph LR
 
 The system has three main components:
 
-1. **Test Runner CLI**: Bun-based orchestrator that manages test execution.
+1. **VICT Runner CLI**: Bun-based orchestrator that manages test execution.
 2. **MCP Servers**: Model Context Protocol implementations for:
    - **Playwright MCP**: Provides browser automation capabilities through standard MCP tools
-   - **Test State MCP**: A local HTTP server that maintains test execution state, tracks step completion, and enables Claude Code to query the current test plan and update progress in real-time
+   - **VICT State MCP**: A local HTTP server that maintains test execution state, tracks step completion, and enables Claude Code to query the current test plan and update progress in real-time
 3. **Claude Code Integration**: Executes test steps using the Claude Code SDK
 
-The Test State MCP server is particularly important as it provides a feedback loop between the test runner and Claude Code. 
+The VICT State MCP server is particularly important as it provides a feedback loop between the test runner and Claude Code.
 It exposes two main tools:
 - `get_test_plan`: Returns the current test case definition and step statuses
 - `update_test_step`: Allows Claude Code to mark steps as passed/failed with error details
 
-This architecture ensures Claude Code always knows what test it's executing and can report results back to the runner, 
+This architecture ensures Claude Code always knows what test it's executing and can report results back to the VICT runner,
 enabling proper test orchestration and reporting.

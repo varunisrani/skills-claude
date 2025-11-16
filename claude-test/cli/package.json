@@ -1,5 +1,6 @@
 {
-  "name": "claude-code-tests",
+  "name": "varun-israni-claude-tester",
+  "description": "Varun Israni Claude Tester (VICT) - A comprehensive testing framework for Claude Code workflows",
   "module": "index.ts",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
@@ -14,7 +15,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "bun build --compile ./src/index.ts --outfile ./dist/cc-test-runner --target bun",
+    "build": "bun build --compile ./src/index.ts --outfile ./dist/vict-runner --target bun",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },

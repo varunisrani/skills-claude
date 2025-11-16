@@ -60,7 +60,7 @@ export class TestReporter {
             specVersion: "0.0.0",
             results: {
                 tool: {
-                    name: "claude-code-tests",
+                    name: "varun-israni-claude-tester",
                     version: "1.0.0",
                 },
                 summary: {

@@ -20,7 +20,7 @@ for (const testCase of inputs.testCases) {
     server.setTestState(testCase);
 
     for await (const message of startTest(testCase)) {
-        logger.debug("Received Claude Code message", {
+        logger.debug("Received VICT message", {
             test_id: testCase.id,
             message: JSON.stringify(message),
         });

@@ -1,4 +1,4 @@
-name: Test Claude Code Action
+name: Test VICT Action
 
 on:
   workflow_dispatch:
@@ -23,8 +23,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Run Claude Code Tests
-      run: /app/cc-test-runner --testsPath=$GITHUB_WORKSPACE/samples/thisinto-e2e-tests.json --resultsPath=/test/results/
+    - name: Run VICT Tests
+      run: /app/vict-runner --testsPath=$GITHUB_WORKSPACE/samples/vict-sample-tests.json --resultsPath=/test/results/
 
     - name: Publish Test Report
       uses: ctrf-io/github-test-reporter@v1
