@@ -8,17 +8,33 @@ interface IssueListProps {
   issues: any[];
   owner: string;
   repo: string;
+  hideStateFilter?: boolean;
 }
 
-export default function IssueList({ issues, owner, repo }: IssueListProps) {
+export default function IssueList({ issues, owner, repo, hideStateFilter = false }: IssueListProps) {
   const [filter, setFilter] = useState<'all' | 'open' | 'closed'>('open');
   const [searchTerm, setSearchTerm] = useState('');
 
+  console.log('IssueList - Received props:', { 
+    issuesCount: issues.length, 
+    hideStateFilter,
+    issues: issues.map(issue => ({ number: issue.number, title: issue.title, state: issue.state }))
+  });
+
+  // Only apply state filtering if not hidden (for backward compatibility)
   const filteredIssues = issues.filter((issue) => {
-    const matchesFilter = filter === 'all' || issue.state === filter;
+    const matchesFilter = hideStateFilter ? true : (filter === 'all' || issue.state === filter);
     const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       issue.body?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
+  });
+
+  console.log('IssueList - Filtered issues:', {
+    originalCount: issues.length,
+    filteredCount: filteredIssues.length,
+    filter,
+    searchTerm,
+    hideStateFilter
   });
 
   const openCount = issues.filter(i => i.state === 'open').length;
@@ -27,26 +43,28 @@ export default function IssueList({ issues, owner, repo }: IssueListProps) {
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
-        <div className={styles.filters}>
-          <button
-            className={`${styles.filterBtn} ${filter === 'open' ? styles.active : ''}`}
-            onClick={() => setFilter('open')}
-          >
-            Open ({openCount})
-          </button>
-          <button
-            className={`${styles.filterBtn} ${filter === 'closed' ? styles.active : ''}`}
-            onClick={() => setFilter('closed')}
-          >
-            Closed ({closedCount})
-          </button>
-          <button
-            className={`${styles.filterBtn} ${filter === 'all' ? styles.active : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            All ({issues.length})
-          </button>
-        </div>
+        {!hideStateFilter && (
+          <div className={styles.filters}>
+            <button
+              className={`${styles.filterBtn} ${filter === 'open' ? styles.active : ''}`}
+              onClick={() => setFilter('open')}
+            >
+              Open ({openCount})
+            </button>
+            <button
+              className={`${styles.filterBtn} ${filter === 'closed' ? styles.active : ''}`}
+              onClick={() => setFilter('closed')}
+            >
+              Closed ({closedCount})
+            </button>
+            <button
+              className={`${styles.filterBtn} ${filter === 'all' ? styles.active : ''}`}
+              onClick={() => setFilter('all')}
+            >
+              All ({issues.length})
+            </button>
+          </div>
+        )}
 
         <div className={styles.search}>
           <input

@@ -5,6 +5,7 @@ export default function RepositoriesLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log('RepositoriesLayout - Rendering layout with children:', children);
   return (
     <>
       <Navbar />

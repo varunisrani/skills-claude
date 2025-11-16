@@ -25,12 +25,14 @@ export default function IssueForm({ owner, repo, onSuccess, onCancel }: IssueFor
 
     if (!token || !title.trim()) return;
 
+    console.log('IssueForm - Creating issue', { owner, repo, title });
     setLoading(true);
     setError(null);
 
     try {
       const octokit = createGitHubClient(token);
-      await createIssue(octokit, owner, repo, title, body);
+      const result = await createIssue(octokit, owner, repo, title, body);
+      console.log('IssueForm - Issue created successfully', result);
 
       // Reset form
       setTitle('');
@@ -38,9 +40,11 @@ export default function IssueForm({ owner, repo, onSuccess, onCancel }: IssueFor
 
       // Call success callback
       if (onSuccess) {
+        console.log('IssueForm - Calling onSuccess callback');
         onSuccess();
       }
     } catch (err: any) {
+      console.error('IssueForm - Error creating issue:', err);
       setError(err.message || 'Failed to create issue');
     } finally {
       setLoading(false);

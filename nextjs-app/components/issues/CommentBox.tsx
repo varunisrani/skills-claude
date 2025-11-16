@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { createGitHubClient } from '@/lib/github/client';
 import { createComment } from '@/lib/github/issues';
+import { cache } from '@/lib/storage/cache';
 import styles from './CommentBox.module.css';
 
 interface CommentBoxProps {
@@ -28,14 +29,24 @@ export default function CommentBox({ owner, repo, issueNumber, onSuccess }: Comm
     setError(null);
 
     try {
+      console.log('CommentBox - Creating comment', { owner, repo, issueNumber, body: body.substring(0, 50) + '...' });
+      
       const octokit = createGitHubClient(token);
-      await createComment(octokit, owner, repo, issueNumber, body);
+      const result = await createComment(octokit, owner, repo, issueNumber, body);
+      
+      console.log('CommentBox - Comment created successfully', result);
+
+      // Clear the issue cache to force refresh
+      const cacheKey = `issue_${owner}_${repo}_${issueNumber}`;
+      console.log('CommentBox - Clearing cache key:', cacheKey);
+      cache.remove(cacheKey);
 
       // Reset form
       setBody('');
 
       // Call success callback
       if (onSuccess) {
+        console.log('CommentBox - Calling onSuccess callback');
         onSuccess();
       }
     } catch (err: any) {

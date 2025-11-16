@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useIssues } from '@/hooks/useIssues';
 import IssueList from '@/components/issues/IssueList';
 import IssueForm from '@/components/issues/IssueForm';
+import { RotateCcw, Plus } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function IssuesPage() {
@@ -17,12 +18,21 @@ export default function IssuesPage() {
   const [showForm, setShowForm] = useState(false);
   const [stateFilter, setStateFilter] = useState<'open' | 'closed' | 'all'>('open');
 
-  const { issues, loading, error } = useIssues(owner, repo, stateFilter);
+  const { issues, loading, error, refresh } = useIssues(owner, repo, stateFilter);
+
+  console.log('IssuesPage - Current state:', { 
+    issues: issues.length, 
+    loading, 
+    error, 
+    stateFilter,
+    issuesList: issues.map(issue => ({ id: issue.number, title: issue.title }))
+  });
 
   const handleIssueCreated = () => {
+    console.log('IssuesPage - Issue created, hiding form and refreshing');
     setShowForm(false);
-    // Refresh the page to show new issue
-    router.refresh();
+    // Refresh issues data to show new issue
+    refresh();
   };
 
   if (loading) {
@@ -58,12 +68,26 @@ export default function IssuesPage() {
 
         <div className={styles.titleRow}>
           <h1 className={styles.title}>Issues</h1>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className={styles.newIssueBtn}
-          >
-            {showForm ? 'Cancel' : 'New Issue'}
-          </button>
+          <div className={styles.actions}>
+            <button
+              onClick={() => {
+                console.log('Manual refresh button clicked');
+                refresh();
+              }}
+              className={styles.refreshBtn}
+              disabled={loading}
+            >
+              <RotateCcw size={16} className={loading ? styles.spinning : ''} />
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className={styles.newIssueBtn}
+            >
+              <Plus size={16} />
+              {showForm ? 'Cancel' : 'New Issue'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -80,7 +104,28 @@ export default function IssuesPage() {
       )}
 
       <div className={styles.content}>
-        <IssueList issues={issues} owner={owner} repo={repo} />
+        <div className={styles.stateFilters}>
+          <button
+            className={`${styles.stateBtn} ${stateFilter === 'open' ? styles.active : ''}`}
+            onClick={() => setStateFilter('open')}
+          >
+            Open Issues
+          </button>
+          <button
+            className={`${styles.stateBtn} ${stateFilter === 'closed' ? styles.active : ''}`}
+            onClick={() => setStateFilter('closed')}
+          >
+            Closed Issues
+          </button>
+          <button
+            className={`${styles.stateBtn} ${stateFilter === 'all' ? styles.active : ''}`}
+            onClick={() => setStateFilter('all')}
+          >
+            All Issues
+          </button>
+        </div>
+        
+        <IssueList issues={issues} owner={owner} repo={repo} hideStateFilter={true} />
       </div>
     </div>
   );

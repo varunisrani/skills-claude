@@ -19,37 +19,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log('AuthProvider - Current state:', { token: !!token, user, isLoading });
+
   useEffect(() => {
+    console.log('AuthProvider - Checking localStorage for saved auth');
     // Load from localStorage on mount
     const savedToken = authStorage.getToken();
     const savedUser = authStorage.getUser();
 
+    console.log('AuthProvider - Found in localStorage:', { token: !!savedToken, user: savedUser });
+
     if (savedToken && savedUser) {
+      console.log('AuthProvider - Setting auth from localStorage');
       setToken(savedToken);
       setUser(savedUser);
     }
+    console.log('AuthProvider - Setting isLoading to false');
     setIsLoading(false);
   }, []);
 
   const login = async (newToken: string) => {
+    console.log('AuthProvider - Login called with token');
     try {
       // Verify token by fetching user data
       const octokit = new Octokit({ auth: newToken });
       const { data: userData } = await octokit.rest.users.getAuthenticated();
+      
+      console.log('AuthProvider - User authenticated:', userData);
 
       setToken(newToken);
       setUser(userData);
       authStorage.setToken(newToken);
       authStorage.setUser(userData);
+      
+      console.log('AuthProvider - Login successful, auth saved');
     } catch (error) {
+      console.error('AuthProvider - Login failed:', error);
       throw new Error('Invalid token');
     }
   };
 
   const logout = () => {
+    console.log('AuthProvider - Logout called');
     setToken(null);
     setUser(null);
     authStorage.removeToken();
+    console.log('AuthProvider - Logout complete, auth cleared');
   };
 
   return (

@@ -14,8 +14,15 @@ export default function RepositoriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
+  console.log('RepositoriesPage - Component rendered');
+  console.log('RepositoriesPage - Auth state:', { user, authLoading });
+  console.log('RepositoriesPage - Repos state:', { repos, loading, error });
+  console.log('RepositoriesPage - Search query:', searchQuery);
+
   useEffect(() => {
+    console.log('RepositoriesPage - useEffect triggered', { authLoading, user });
     if (!authLoading && !user) {
+      console.log('RepositoriesPage - Redirecting to home, no user found');
       router.push('/');
     }
   }, [user, authLoading, router]);
@@ -36,6 +43,8 @@ export default function RepositoriesPage() {
       repo.language?.toLowerCase().includes(query)
     );
   });
+
+  console.log('RepositoriesPage - Filtered repos:', filteredRepos.length, 'out of', repos.length);
 
   return (
     <div className={styles.container}>
