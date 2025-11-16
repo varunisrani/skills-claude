@@ -77,8 +77,12 @@ export function ShortcutsProvider({
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [selectedTaskIndex, setSelectedTaskIndex] = useState(0);
-  const [totalTasks, setTotalTasks] = useState(0);
-  const [visibleTaskIds, setVisibleTaskIds] = useState<number[]>([]);
+  const [totalTasks, setTotalTasksState] = useState(0);
+  const [visibleTaskIds, setVisibleTaskIdsState] = useState<number[]>([]);
+
+  // Wrap setters in useCallback to prevent infinite re-renders
+  const setTotalTasks = useCallback((count: number) => setTotalTasksState(count), []);
+  const setVisibleTaskIds = useCallback((ids: number[]) => setVisibleTaskIdsState(ids), []);
 
   // Help modal handlers
   const openHelp = useCallback(() => setIsHelpOpen(true), []);

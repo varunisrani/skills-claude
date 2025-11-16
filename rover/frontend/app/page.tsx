@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { TaskList } from "@/components/tasks/TaskList"
 import { CreateTaskForm } from "@/components/tasks/CreateTaskForm"
@@ -26,11 +26,11 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { openHelp } = useShortcuts()
 
-  const handleTaskClick = (taskId: number) => {
+  const handleTaskClick = useCallback((taskId: number) => {
     router.push(`/tasks/${taskId}`)
-  }
+  }, [router])
 
-  const handleTaskCreated = (task: Task) => {
+  const handleTaskCreated = useCallback((task: Task) => {
     setIsDialogOpen(false)
     // TanStack Query will automatically refetch the tasks list
     const taskId = task.id || task.taskId
@@ -39,7 +39,11 @@ export default function Home() {
       return
     }
     router.push(`/tasks/${taskId}`)
-  }
+  }, [router])
+
+  const handleDialogCancel = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [])
 
   // Register page-specific shortcuts
   useKeyboardShortcut(
@@ -91,7 +95,7 @@ export default function Home() {
                 </DialogHeader>
                 <CreateTaskForm
                   onSuccess={handleTaskCreated}
-                  onCancel={() => setIsDialogOpen(false)}
+                  onCancel={handleDialogCancel}
                 />
               </DialogContent>
             </Dialog>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { TaskStatus } from "@/types/task"
 import { TaskCard } from "./TaskCard"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -56,11 +56,24 @@ export function TaskList({ onTaskClick }: TaskListProps) {
   const visibleTaskIds = useMemo(() => filteredTasks.map((task) => task.id || task.taskId).filter((id) => id !== undefined) as number[], [filteredTasks])
 
   // Update shortcuts context when filtered tasks change
-  // Only depend on the actual data, not the callbacks
+  const prevTaskCountRef = useRef(0)
+  const prevTaskIdsRef = useRef<number[]>([])
+  
   useEffect(() => {
-    setTotalTasks(filteredTasks.length)
-    setVisibleTaskIds(visibleTaskIds)
-  }, [filteredTasks.length, visibleTaskIds])
+    const taskCount = filteredTasks.length
+    const taskIds = filteredTasks.map((task) => task.id || task.taskId).filter((id) => id !== undefined) as number[]
+    
+    // Only update if values actually changed
+    if (taskCount !== prevTaskCountRef.current) {
+      setTotalTasks(taskCount)
+      prevTaskCountRef.current = taskCount
+    }
+    
+    if (JSON.stringify(taskIds) !== JSON.stringify(prevTaskIdsRef.current)) {
+      setVisibleTaskIds(taskIds)
+      prevTaskIdsRef.current = taskIds
+    }
+  }, [filteredTasks, setTotalTasks, setVisibleTaskIds])
 
   if (isLoading) {
     return (
