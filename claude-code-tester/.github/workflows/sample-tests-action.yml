@@ -1,0 +1,42 @@
+name: Test Claude Code Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      container-tag:
+        description: 'Container tag to use'
+        required: false
+        default: 'main'
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}:${{ inputs.container-tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Claude Code Tests
+      run: /app/vc-tester --testsPath=$GITHUB_WORKSPACE/samples/thisinto-e2e-tests.json --resultsPath=/test/results/
+
+    - name: Publish Test Report
+      uses: ctrf-io/github-test-reporter@v1
+      with:
+        report-path: '/test/results/**/ctrf-results.json'
+        github-report: true
+      if: always()
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ github.run_id }}
+        path: /test/results/
+        retention-days: 30

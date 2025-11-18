@@ -1,0 +1,40 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║                    ⚠️  UNDER CONSTRUCTION ⚠️                  ║
+║                                                              ║
+║                  CLAUDE CODE TESTER PROJECT                  ║
+║                                                              ║
+║              🚧  NOT READY FOR PRODUCTION USE  🚧            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+PROJECT STATUS: UNDER BUILD
+DATE: 2025-11-18
+VERSION: Development Branch
+
+This project is currently being developed and is NOT stable.
+
+⚠️  WARNING: This is an experimental E2E testing tool:
+    - Uses Claude Code for test execution
+    - Integrates Playwright via MCP
+    - Natural language test definitions
+    - AI-powered adaptive testing
+
+🚧  DEVELOPMENT PHASE: Active implementation and testing
+
+❌  NOT PRODUCTION READY
+❌  BREAKING CHANGES EXPECTED
+❌  USE AT YOUR OWN RISK
+
+✅  TESTING WELCOME
+✅  FEEDBACK APPRECIATED
+✅  CONTRIBUTIONS CONSIDERED
+
+For status updates, see STATUS.md
+For project info, see README.md
+
+Previously: Varun Israni Claude Tester (VICT)
+
+╔══════════════════════════════════════════════════════════════╗
+║              🏗️  BUILD IN PROGRESS - STAND BY  🏗️            ║
+╚══════════════════════════════════════════════════════════════╝

@@ -1,0 +1,37 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║                    ⚠️  UNDER CONSTRUCTION ⚠️                  ║
+║                                                              ║
+║                      DEVIN-CLAUDE PROJECT                    ║
+║                                                              ║
+║              🚧  NOT READY FOR PRODUCTION USE  🚧            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+PROJECT STATUS: UNDER BUILD
+DATE: 2025-11-18
+VERSION: Development Branch
+
+This project is currently being developed and is NOT stable.
+
+⚠️  WARNING: This is an experimental integration of:
+    - OpenHands (AI Software Development Platform)
+    - Claude Agent SDK
+    - Custom Devin-Claude Architecture
+
+🚧  DEVELOPMENT PHASE: Active integration and testing
+
+❌  NOT PRODUCTION READY
+❌  BREAKING CHANGES EXPECTED
+❌  USE AT YOUR OWN RISK
+
+✅  TESTING WELCOME
+✅  FEEDBACK APPRECIATED
+✅  CONTRIBUTIONS CONSIDERED
+
+For status updates, see STATUS.md
+For project info, see README.md
+
+╔══════════════════════════════════════════════════════════════╗
+║              🏗️  BUILD IN PROGRESS - STAND BY  🏗️            ║
+╚══════════════════════════════════════════════════════════════╝
