@@ -1,4 +1,0 @@
-# Skip node_modules and rover for development image
-.rover
-.claude
-node_modules

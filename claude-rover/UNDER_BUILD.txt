@@ -1,0 +1,39 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║                    ⚠️  UNDER CONSTRUCTION ⚠️                  ║
+║                                                              ║
+║                     CLAUDE-ROVER PROJECT                     ║
+║                                                              ║
+║              🚧  NOT READY FOR PRODUCTION USE  🚧            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+PROJECT STATUS: UNDER BUILD
+DATE: 2025-11-18
+VERSION: Development Branch
+
+This project is currently being developed and is NOT stable.
+
+⚠️  WARNING: This is a customized version of:
+    - Rover (AI Coding Agent Manager by Endor)
+    - Optimized for Claude Code workflows
+    - Enhanced Claude integration features
+
+🚧  DEVELOPMENT PHASE: Active customization and testing
+
+❌  NOT PRODUCTION READY
+❌  BREAKING CHANGES EXPECTED
+❌  USE AT YOUR OWN RISK
+
+✅  TESTING WELCOME
+✅  FEEDBACK APPRECIATED
+✅  CONTRIBUTIONS CONSIDERED
+
+For status updates, see STATUS.md
+For project info, see README.md
+
+Original Rover: https://github.com/endorhq/rover
+
+╔══════════════════════════════════════════════════════════════╗
+║              🏗️  BUILD IN PROGRESS - STAND BY  🏗️            ║
+╚══════════════════════════════════════════════════════════════╝

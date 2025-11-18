@@ -1,345 +1,408 @@
-# OpenHands + Claude Agent SDK - Complete Setup Package
+# Claude Code Skills Repository
 
-**Status:** ✅ READY TO RUN ON PORT 3000
+> **A comprehensive collection of Claude Code tools, workflows, and automation systems**
+
 **Environment:** Windows 11 | Python 3.13.7 | Node 22.18.0
-**Date Generated:** November 9, 2025
+**Last Updated:** November 18, 2025
 
 ---
 
-## 🎯 START HERE - 3 Options
+## 📋 Repository Overview
 
-### ⚡ FASTEST (Just Run It)
-**File:** `EXECUTE_NOW.md`
-- Copy-paste commands to get running in 10 minutes
-- Step-by-step execution guide
-- Perfect for impatient people
+This repository contains **7 specialized projects** for Claude Code development, covering everything from documentation and project management to testing and agent orchestration.
 
-### 📖 COMPLETE (Learn Everything)
-**File:** `LOCAL_SETUP_GUIDE.md`
-- Detailed setup instructions (17.3 KB)
-- All 3 cloud SDK options explained
-- Troubleshooting guide
-- API reference
+### Quick Status Guide
 
-### 🎬 VISUAL (Quick Overview)
-**File:** `COMPLETE_SUMMARY.txt`
-- Formatted with ASCII art
-- All key info at a glance
-- Perfect for skimming
+| Status | Meaning | Usage |
+|--------|---------|-------|
+| ✅ **Stable** | Production-ready, fully tested | Safe for production use |
+| 🚧 **Under Build** | Experimental, active development | Testing and experimentation only |
 
 ---
 
-## 📦 What You Have
+## 🗂️ Projects in This Repository
 
-### Setup & Execution Files (5)
-```
-✓ EXECUTE_NOW.md          - Copy & paste commands to run
-✓ START_HERE.md           - 5-minute quick start
-✓ LOCAL_SETUP_GUIDE.md    - Complete setup guide
-✓ QUICK_START.bat         - Auto-start script (Windows)
-✓ quick_start.py          - Diagnostic test script
-```
+### 📚 Documentation & Learning
 
-### Verification & Analysis (3)
-```
-✓ CLAUDE_SDK_IMPLEMENTATION_VERIFICATION.md  - Code audit
-✓ PROJECT_STATUS_ANALYSIS.md                 - Project status
-✓ FINAL_VERIFICATION_SUMMARY.md              - Quick reference
-```
+#### 1. **Claude Code Insight Guide** ✅
+> **Deep-dive technical documentation for AI CLI tools**
 
-### Documentation & Summaries (3)
-```
-✓ COMPLETE_SUMMARY.txt    - Visual overview
-✓ INDEX.md                - File index & guide
-✓ README.md               - This file
-```
-
-**Total: 11 files created for you**
+- **Path:** `claude-code-insight-guide/`
+- **Status:** ✅ Stable
+- **Purpose:** Comprehensive technical documentation covering Claude Agent SDK, OpenHands, Aider, and Cursor
+- **What's Inside:**
+  - 118+ markdown files with detailed analysis
+  - Architecture breakdowns
+  - API references
+  - Integration guides
+  - Best practices and patterns
+- **Quick Start:** [Read README →](./claude-code-insight-guide/README.md)
 
 ---
 
-## 🚀 QUICKEST START (10 Minutes)
+### 🎯 Project Management Systems
 
-### 1. Get API Key (2 minutes)
-```
-→ https://console.anthropic.com/
-→ API Keys → Create Key
-→ Copy the key (sk-ant-...)
+#### 2. **Claude Advanced PM** 🚧
+> **Spec-driven development workflow with GitHub Issues and parallel AI agents**
+
+- **Path:** `claude-advanced-pm/`
+- **Status:** 🚧 Under Build (based on [Claude Code PM](https://github.com/automazeio/ccpm) by Automaze.io)
+- **Purpose:** Battle-tested project management for Claude Code that eliminates context loss
+- **Key Features:**
+  - PRD → Epic → Task → GitHub → Production workflow
+  - Parallel agent execution (5-8 simultaneous tasks)
+  - GitHub Issues as database
+  - Full traceability from idea to production
+  - 89% less context switching
+- **Quick Start:** [Read README →](./claude-advanced-pm/README.md) | [Check Status →](./claude-advanced-pm/STATUS.md)
+- **Commands:** `/pm:init`, `/pm:prd-new`, `/pm:epic-oneshot`, `/pm:next`
+
+#### 3. **Claude PM Workflow** ✅
+> **Lightweight, fast automation for Claude Code projects**
+
+- **Path:** `claude-pm-workflow/`
+- **Status:** ✅ Stable
+- **Purpose:** Quick project management without heavy setup
+- **What's Inside:**
+  - Lightweight workflow commands
+  - Fast task management
+  - GitHub integration
+  - Minimal configuration
+- **Quick Start:** [Read README →](./claude-pm-workflow/README.md)
+
+---
+
+### 🤖 AI Agent Systems
+
+#### 4. **Devin-Claude** 🚧
+> **OpenHands fork with enhanced Claude Agent SDK integration**
+
+- **Path:** `devin-claude/`
+- **Status:** 🚧 Under Build (experimental OpenHands fork)
+- **Purpose:** AI agent framework for autonomous software development
+- **Key Features:**
+  - 6 specialized agents (CodeAct, Browsing, ReadOnly, LOC, Visual, Dummy)
+  - Full Claude Agent SDK implementation
+  - Docker sandbox isolation
+  - Web UI on port 3000
+  - MCP server integration (Jupyter, Browser)
+- **Quick Start:** [Read README →](./devin-claude/README.md) | [Check Status →](./devin-claude/STATUS.md)
+- **Setup Time:** 10 minutes
+
+#### 5. **Claude Rover** 🚧
+> **Advanced agent orchestration with Git worktrees and parallel execution**
+
+- **Path:** `claude-rover/`
+- **Status:** 🚧 Under Build
+- **Purpose:** Multi-agent orchestration system for complex development tasks
+- **Key Features:**
+  - Git worktree-based isolation
+  - Parallel agent execution
+  - Frontend: Next.js 16 + React 19 + TypeScript
+  - Backend: Python + FastAPI
+  - Real-time agent coordination
+- **Quick Start:** [Read README →](./claude-rover/README.md) | [Frontend Guide →](./claude-rover/FRONTEND_GUIDE.md) | [Check Status →](./claude-rover/STATUS.md)
+
+#### 6. **Claude Code Skills** ✅
+> **Reusable skills and agents for Claude Code**
+
+- **Path:** `claude-code-skills/`
+- **Status:** ✅ Stable
+- **Purpose:** Collection of pre-built skills and agent templates
+- **What's Inside:**
+  - Specialized agent definitions
+  - Reusable skill modules
+  - Integration patterns
+  - Best practices
+- **Quick Start:** [Read README →](./claude-code-skills/README.md)
+
+---
+
+### 🧪 Testing & Quality
+
+#### 7. **Claude Code Tester** 🚧
+> **E2E test automation with natural language test definitions**
+
+- **Path:** `claude-code-tester/`
+- **Status:** 🚧 Under Build
+- **Purpose:** Automated end-to-end testing for Claude Code projects
+- **Key Features:**
+  - Natural language test definitions
+  - Playwright MCP integration
+  - Automated test execution
+  - Screenshot capture
+  - Result reporting
+- **Quick Start:** [Read README →](./claude-code-tester/README.md) | [Check Status →](./claude-code-tester/STATUS.md)
+- **Usage:**
+  ```bash
+  ./dist/claude-code-tester --testsPath=./tests.json
+  ```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Ensure you have these installed:
+- **Python:** 3.13.7+
+- **Node.js:** 22.18.0+
+- **Git:** Latest version
+- **GitHub CLI:** For PM systems (`gh` command)
+
+### Choose Your Path
+
+#### 🎓 Learning & Documentation
+Start with **Claude Code Insight Guide** to understand AI CLI tools:
+```bash
+cd claude-code-insight-guide
+# Browse the documentation
 ```
 
-### 2. Set Environment Variable (1 minute)
-```batch
-setx ANTHROPIC_API_KEY sk-ant-your-key-here
+#### 📋 Project Management
+Use **Claude Advanced PM** for structured, spec-driven development:
+```bash
+cd claude-advanced-pm
+/pm:init
+/pm:prd-new your-feature
 ```
-Then restart Command Prompt.
 
-### 3. Install & Run (3 minutes)
-```batch
-cd "C:\Users\Varun israni\skills-claude\OpenHands"
+Or use **Claude PM Workflow** for lightweight task management:
+```bash
+cd claude-pm-workflow
+# Follow the README for setup
+```
+
+#### 🤖 AI Agent Development
+Try **Devin-Claude** for autonomous coding:
+```bash
+cd devin-claude
 pip install -e .
 python -m openhands.server.app --port 3000
+# Open http://localhost:3000
 ```
 
-### 4. Open Browser (instant)
-```
-http://localhost:3000
+Or explore **Claude Rover** for advanced orchestration:
+```bash
+cd claude-rover
+# See README and FRONTEND_GUIDE for setup
 ```
 
-### 5. Test Agent (2 minutes)
-- Select CodeActAgent
-- Type a task
-- Watch it execute
+#### 🧪 Testing & Quality
+Use **Claude Code Tester** for E2E testing:
+```bash
+cd claude-code-tester
+npm install
+./dist/claude-code-tester --testsPath=./tests.json
+```
 
 ---
 
-## 📚 Which File to Read?
+## 📊 Project Comparison
 
-| Need | File | Time |
-|------|------|------|
-| Just run it | `EXECUTE_NOW.md` | 10 min |
-| Quick start | `START_HERE.md` | 5 min |
-| Everything | `LOCAL_SETUP_GUIDE.md` | 20 min |
-| Visual guide | `COMPLETE_SUMMARY.txt` | 5 min |
-| File index | `INDEX.md` | 5 min |
-| Verification | `CLAUDE_SDK_IMPLEMENTATION_VERIFICATION.md` | 30 min |
-| Auto-start | `QUICK_START.bat` | instant |
-| Diagnostic | `python quick_start.py` | 2 min |
+### Project Management: Advanced PM vs PM Workflow
 
----
+| Feature | Claude Advanced PM | Claude PM Workflow |
+|---------|-------------------|-------------------|
+| Status | 🚧 Under Build | ✅ Stable |
+| Setup Complexity | Moderate | Low |
+| GitHub Integration | Deep (Issues, PRs) | Basic |
+| Parallel Agents | ✅ Yes (5-8 tasks) | ❌ No |
+| Traceability | Full (PRD→Code) | Basic |
+| Best For | Large features, teams | Quick tasks, solo |
 
-## 🤖 Available Agents (All Have Claude Agent SDK)
+### Agent Systems: Devin-Claude vs Claude Rover
 
-```
-CodeActAgent          → Code execution, file operations
-BrowsingAgent         → Web browsing, automation
-ReadOnlyAgent         → Safe file reading only
-LOCAgent              → Code analysis, metrics
-VisualBrowsingAgent   → Visual web interaction
-DummyAgent            → Testing, demo purposes
-```
-
-All 6 agents: **100% Claude Agent SDK implementation** ✓
+| Feature | Devin-Claude | Claude Rover |
+|---------|-------------|--------------|
+| Status | 🚧 Under Build | 🚧 Under Build |
+| Based On | OpenHands | Custom |
+| Agents | 6 pre-built | Custom orchestration |
+| Isolation | Docker sandbox | Git worktrees |
+| UI | Web UI (port 3000) | Frontend + Backend |
+| Best For | Autonomous coding | Complex workflows |
 
 ---
 
-## 🌐 Cloud SDK Options
+## 🎯 Common Workflows
 
-### Option 1: Claude API (RECOMMENDED) ⭐
-- **Setup:** 30 seconds (just API key)
-- **Best for:** Development, testing, quick iteration
-- **Get key:** https://console.anthropic.com/
+### Workflow 1: Spec-Driven Feature Development
 
-```python
-from anthropic import Anthropic
+```bash
+# 1. Create PRD
+cd claude-advanced-pm
+/pm:prd-new memory-system
 
-client = Anthropic(api_key="sk-ant-your-key")
-message = client.messages.create(
-    model="claude-sonnet-4-5-20250929",
-    messages=[{"role": "user", "content": "Hi!"}]
-)
-print(message.content[0].text)
+# 2. Generate Epic
+/pm:prd-parse memory-system
+
+# 3. Push to GitHub
+/pm:epic-oneshot memory-system
+
+# 4. Start development
+/pm:issue-start 1234
+
+# 5. Test implementation
+cd ../claude-code-tester
+./dist/claude-code-tester --testsPath=./tests.json
 ```
 
-### Option 2: AWS Bedrock
-- **Setup:** 10 minutes (AWS account + config)
-- **Best for:** Enterprise, private networks
-- **Requires:** AWS account, model access request
+### Workflow 2: Autonomous Agent Development
 
-### Option 3: Google Vertex AI
-- **Setup:** 15 minutes (GCP account + config)
-- **Best for:** GCP users, multi-modal support
-- **Requires:** GCP project, Vertex AI enabled
-
----
-
-## ✅ Verification Summary
-
-**Claude Agent SDK in OpenHands:** ✅ 100% IMPLEMENTED
-
-| Component | Status | Details |
-|-----------|--------|---------|
-| All 6 agents | ✅ Complete | 2,623 LOC verified |
-| Core adapter | ✅ Complete | 443 LOC verified |
-| Factory pattern | ✅ Complete | 389 LOC verified |
-| MCP servers | ✅ Complete | Jupyter & Browser |
-| Testing | ✅ Complete | 19 tests (E2E + perf) |
-| Documentation | ✅ Complete | 60+ KB |
-| Performance | ✅ Verified | 10-15% faster |
-| Backward compat | ✅ Confirmed | 100% compatible |
-
----
-
-## 📊 What You Get
-
-### Ready to Run ✓
-- Full OpenHands framework
-- All 6 agents with SDK
-- Claude API integration
-- Web UI on port 3000
-
-### Fully Tested ✓
-- 10 E2E test scenarios
-- 9 performance benchmarks
-- 90%+ code coverage
-- Production-ready
-
-### Well Documented ✓
-- Setup guides
-- API reference
-- Troubleshooting guide
-- Code examples
-- Verification reports
-
----
-
-## 🎯 Your First 10 Minutes
-
-```
-Minute  1: Get API key
-Minute  2: Set environment variable
-Minute  3-5: Install dependencies
-Minute  6: Run server
-Minute  7: Open browser
-Minute  8-10: Test agent
-```
-
-**Result:** Full working OpenHands system running locally!
-
----
-
-## 🔧 System Requirements
-
-**You Already Have:**
-- ✅ Python 3.13.7
-- ✅ Node.js v22.18.0
-- ✅ npm 11.6.2
-- ✅ Windows 11
-
-**You Need to Get:**
-- Anthropic API Key (free at https://console.anthropic.com/)
-
----
-
-## 🚦 Step-by-Step
-
-### Step 1: Get API Key
-1. Go to https://console.anthropic.com/
-2. Click "API Keys"
-3. Click "Create Key"
-4. Copy the key
-
-### Step 2: Set Environment Variable
-```batch
-setx ANTHROPIC_API_KEY sk-ant-your-key-here
-```
-
-### Step 3: Install
-```batch
-cd "C:\Users\Varun israni\skills-claude\OpenHands"
-pip install -e .
-```
-
-### Step 4: Run
-```batch
+```bash
+# 1. Start agent framework
+cd devin-claude
 python -m openhands.server.app --port 3000
+
+# 2. Open browser
+# Navigate to http://localhost:3000
+
+# 3. Select agent and give task
+# Watch autonomous execution
 ```
 
-### Step 5: Test
-Open: http://localhost:3000
+### Workflow 3: Learning & Documentation
 
----
+```bash
+# 1. Browse documentation
+cd claude-code-insight-guide
 
-## 🐛 Common Issues
-
-| Problem | Solution |
-|---------|----------|
-| "API key not found" | Run: `setx ANTHROPIC_API_KEY sk-ant-...` then restart |
-| "Port 3000 in use" | Use: `--port 3001` instead |
-| "Module not found" | Run: `pip install -e .` |
-| "Agent won't start" | Set: `DEBUG=true` and run with `--verbose` |
-
-See `LOCAL_SETUP_GUIDE.md` for detailed troubleshooting.
-
----
-
-## 📖 Documentation Files
-
-### Quick References
-- `EXECUTE_NOW.md` - Copy & paste to run (FASTEST)
-- `START_HERE.md` - 5-minute overview
-- `COMPLETE_SUMMARY.txt` - Visual guide
-- `INDEX.md` - Complete file index
-
-### Detailed Guides
-- `LOCAL_SETUP_GUIDE.md` - Full setup instructions
-- `CLAUDE_SDK_IMPLEMENTATION_VERIFICATION.md` - Code audit
-- `PROJECT_STATUS_ANALYSIS.md` - Project analysis
-
-### Scripts
-- `QUICK_START.bat` - Auto-start (Windows)
-- `quick_start.py` - Diagnostic test
-
----
-
-## 🎉 Ready?
-
-Pick one and start:
-
-### Option A: Run Batch Script (Easiest)
-```batch
-QUICK_START.bat
+# 2. Read specific guides
+# - Claude Agent SDK documentation
+# - OpenHands architecture
+# - Integration patterns
 ```
 
-### Option B: Follow EXECUTE_NOW.md (Fast)
-Open `EXECUTE_NOW.md` and copy commands
+---
 
-### Option C: Read START_HERE.md (Informative)
-Open `START_HERE.md` for complete overview
+## 📁 Repository Structure
 
-### Option D: Read LOCAL_SETUP_GUIDE.md (Comprehensive)
-Open `LOCAL_SETUP_GUIDE.md` for all details
+```
+skills-claude/
+├── claude-code-insight-guide/      # ✅ Documentation & learning
+├── claude-advanced-pm/             # 🚧 Spec-driven PM system
+├── claude-pm-workflow/             # ✅ Lightweight PM
+├── devin-claude/                   # 🚧 OpenHands fork
+├── claude-rover/                   # 🚧 Agent orchestration
+├── claude-code-skills/             # ✅ Reusable skills
+├── claude-code-tester/             # 🚧 E2E testing
+└── README.md                       # This file
+```
 
 ---
 
-## 🚀 Let's Go!
+## ⚠️ Important Notes
 
-All the files you need are here:
-- Setup instructions ✓
-- Auto-start script ✓
-- Diagnostic test ✓
-- Complete documentation ✓
-- Verification reports ✓
+### Experimental Projects (🚧 Under Build)
 
-**Just pick a file and follow along!**
+These projects are actively being developed:
+- **Claude Advanced PM** - Not production-ready
+- **Devin-Claude** - Experimental OpenHands fork
+- **Claude Rover** - Active development
+- **Claude Code Tester** - Testing phase
 
----
+**Warning:** Experimental projects may have:
+- Breaking changes
+- Incomplete features
+- Bugs and issues
+- Unstable APIs
 
-## 📞 Need Help?
+**Use experimental projects for:**
+- ✅ Learning and experimentation
+- ✅ Testing and feedback
+- ✅ Development environments
+- ❌ Production use
 
-1. **For quick start:** Read `EXECUTE_NOW.md`
-2. **For all options:** Read `START_HERE.md`
-3. **For complete guide:** Read `LOCAL_SETUP_GUIDE.md`
-4. **For troubleshooting:** See `LOCAL_SETUP_GUIDE.md` → Troubleshooting
-5. **To verify setup:** Run `python quick_start.py`
-6. **To verify code:** Read `CLAUDE_SDK_IMPLEMENTATION_VERIFICATION.md`
+### Stable Projects (✅)
 
----
-
-## ✅ Summary
-
-**What:** OpenHands framework with Claude Agent SDK
-**How:** Local server on port 3000
-**Time:** 10 minutes to running
-**Complexity:** Simple (just run commands)
-**Cost:** Free (use Claude API tier)
-**Status:** ✅ Production ready
-
-**You have everything. Just pick a file and go!** 🚀
+These projects are production-ready:
+- **Claude Code Insight Guide** - Complete documentation
+- **Claude PM Workflow** - Stable automation
+- **Claude Code Skills** - Tested skills
 
 ---
 
-**Last Updated:** November 9, 2025
-**Files Created:** 11 setup and documentation files
-**Total Size:** 120+ KB
-**Status:** ✅ READY FOR USE
+## 🔗 External Resources
+
+### Original Projects
+- [Claude Code PM (CCPM)](https://github.com/automazeio/ccpm) by Automaze.io
+- [OpenHands](https://github.com/All-Hands-AI/OpenHands) by All-Hands-AI
+
+### Claude Resources
+- [Claude API Documentation](https://docs.anthropic.com/)
+- [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk)
+- [Anthropic Console](https://console.anthropic.com/)
+
+### Tools & Dependencies
+- [GitHub CLI](https://cli.github.com/)
+- [Playwright](https://playwright.dev/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Next.js](https://nextjs.org/)
+
+---
+
+## 📞 Support & Feedback
+
+### For Stable Projects (✅)
+Refer to each project's README for specific support channels.
+
+### For Experimental Projects (🚧)
+- Check STATUS.md in each project
+- Review UNDER_BUILD.txt for warnings
+- Report issues in project directories
+- Testing and feedback welcome
+
+---
+
+## 📝 License
+
+Each project maintains its own license. See individual project directories for details.
+
+- **Claude Advanced PM**: MIT License (based on CCPM by Automaze.io)
+- **Devin-Claude**: Based on OpenHands license
+- **Other projects**: See respective LICENSE files
+
+---
+
+## ✨ Quick Tips
+
+### For New Users
+1. Start with **Claude Code Insight Guide** to understand the ecosystem
+2. Try **Claude PM Workflow** for quick project management
+3. Explore **Claude Code Skills** for reusable patterns
+
+### For Advanced Users
+1. Experiment with **Claude Advanced PM** for complex projects
+2. Test **Devin-Claude** for autonomous development
+3. Build with **Claude Rover** for custom orchestration
+4. Automate with **Claude Code Tester** for quality assurance
+
+### For Contributors
+- Stable projects: Production-ready contributions welcome
+- Experimental projects: Testing, feedback, and experimental PRs welcome
+- Check each project's contribution guidelines
+
+---
+
+## 🎉 What's Next?
+
+Explore the projects that match your needs:
+
+| If you want to... | Use this project |
+|------------------|------------------|
+| Learn AI CLI tools | Claude Code Insight Guide |
+| Manage complex features | Claude Advanced PM |
+| Quick task automation | Claude PM Workflow |
+| Autonomous coding | Devin-Claude |
+| Advanced orchestration | Claude Rover |
+| Reusable patterns | Claude Code Skills |
+| Automated testing | Claude Code Tester |
+
+**Pick a project and dive in! Each README provides detailed setup and usage instructions.**
+
+---
+
+**Happy Building with Claude Code! 🚀**
+
+*Repository curated by Varun Israni*
 
