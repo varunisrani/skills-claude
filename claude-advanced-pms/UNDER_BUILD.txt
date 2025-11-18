@@ -1,0 +1,47 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║                    ⚠️  UNDER CONSTRUCTION ⚠️                  ║
+║                                                              ║
+║                CLAUDE ADVANCED PM PROJECT                    ║
+║                                                              ║
+║              🚧  NOT READY FOR PRODUCTION USE  🚧            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+PROJECT STATUS: UNDER BUILD
+DATE: 2025-11-18
+VERSION: Development Branch
+
+This project is currently being developed and is NOT stable.
+
+⚠️  WARNING: This is an enhanced version of:
+    - Claude Code PM (CCPM) by Automaze.io
+    - Spec-driven development workflow
+    - PRD → Epic → Tasks → GitHub → Production
+
+🚧  DEVELOPMENT PHASE: Active enhancement and testing
+
+KEY FEATURES:
+    ✓ Context preservation across sessions
+    ✓ Parallel AI agent execution
+    ✓ GitHub Issues as database
+    ✓ Full traceability (PRD to production)
+    ✓ Agent specialization system
+
+❌  NOT PRODUCTION READY
+❌  BREAKING CHANGES EXPECTED
+❌  USE AT YOUR OWN RISK
+
+✅  TESTING WELCOME
+✅  FEEDBACK APPRECIATED
+✅  CONTRIBUTIONS CONSIDERED
+
+For status updates, see STATUS.md
+For project info, see README.md
+
+Original Project: https://github.com/automazeio/ccpm
+License: MIT
+
+╔══════════════════════════════════════════════════════════════╗
+║              🏗️  BUILD IN PROGRESS - STAND BY  🏗️            ║
+╚══════════════════════════════════════════════════════════════╝
